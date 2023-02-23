@@ -9,7 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
-public class AuthentificationServiceTest {
+public class AuthenticationServiceTest {
 
     @InjectMocks
     private MainServiceImpl mainService;

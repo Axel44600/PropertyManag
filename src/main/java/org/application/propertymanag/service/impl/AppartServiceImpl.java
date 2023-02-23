@@ -15,13 +15,13 @@ public class AppartServiceImpl implements AppartService {
     private AppartRepository appartRepository;
 
     @Override
-    public Appartement getAppartById(Integer idAppart) {
-        return appartRepository.findById(idAppart).orElseThrow();
+    public Appartement getAppartById(Integer idApart) {
+        return appartRepository.findById(idApart).orElseThrow();
     }
 
     @Override
-    public Appartement getAppartByAdresse(String adresse) {
-        return appartRepository.findByAdresse(adresse);
+    public Appartement getAppartByAdresse(String address) {
+        return appartRepository.findByAdresse(address);
     }
 
     @Override

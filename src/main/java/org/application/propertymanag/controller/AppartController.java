@@ -39,19 +39,19 @@ public class AppartController implements PathConfig {
     }
 
     @GetMapping("/edit_appart/{idAppart}")
-    public String getEditAppart(@PathVariable(name = "idAppart") Integer idAppart, HttpServletResponse response, Model model) throws IOException {
+    public String getEditApart(@PathVariable(name = "idAppart") Integer idAppart, HttpServletResponse response, Model model) throws IOException {
         try {
             Appartement appart = appartService.getAppartById(idAppart);
             model.addAttribute("appart", appart);
             List<Locataire> listOfLocataires;
 
-            if(appart.getId_loc() != null)  {
+            if(appart.getIdLoc() != null)  {
                 listOfLocataires = locataireService.getListOfLocataires().stream().filter(
-                        locataire -> !Objects.equals(locataire.getId_loc(), appart.getId_loc().getId_loc()) &&
-                                appartService.getAppartByIdLocataire(locataire.getId_loc()) == null).toList();
+                        locataire -> !Objects.equals(locataire.getIdLoc(), appart.getIdLoc().getIdLoc()) &&
+                                appartService.getAppartByIdLocataire(locataire.getIdLoc()) == null).toList();
             } else {
                 listOfLocataires = locataireService.getListOfLocataires().stream().filter(
-                        locataire -> appartService.getAppartByIdLocataire(locataire.getId_loc()) == null).toList();
+                        locataire -> appartService.getAppartByIdLocataire(locataire.getIdLoc()) == null).toList();
             }
             model.addAttribute("listOfLocataires", listOfLocataires);
             model.addAttribute("appName", APP_NAME);
@@ -66,19 +66,19 @@ public class AppartController implements PathConfig {
     @PostMapping(value = "/researchAppart", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @Secured({"ADMIN", "EMPLOYE"})
-    public String researchAppart(@RequestParam(name = "addressOrNameL") String value) {
+    public String findApart(@RequestParam(name = "addressOrNameL") String value) {
 
             String valueM = mainService.maj(value);
             boolean[] appartFound = {false, false};
             for (Appartement appart : appartService.getListOfApparts()) {
-                if(appart.getId_loc() == null) {
+                if(appart.getIdLoc() == null) {
                     if (value.equals(appart.getAdresse())) {
                         appartFound[0] = true;
                     }
                 } else {
                     if (value.equals(appart.getAdresse())) {
                         appartFound[0] = true;
-                    } else if (valueM.equals(appart.getId_loc().getNom())) {
+                    } else if (valueM.equals(appart.getIdLoc().getNom())) {
                         appartFound[1] = true;
                     }
                 }
@@ -93,24 +93,24 @@ public class AppartController implements PathConfig {
                     a = appartService.getAppartByAdresse(value);
                 } else {
                     Locataire l = locataireService.getLocataireByNom(valueM);
-                    a = appartService.getAppartByIdLocataire(l.getId_loc());
+                    a = appartService.getAppartByIdLocataire(l.getIdLoc());
                 }
                 return "{" +
                         "\"success\": \"yes\"," +
-                        "\"id\": \"" + a.getId_appart() + "\"," +
+                        "\"id\": \"" + a.getIdAppart() + "\"," +
                         "\"adresse\": \"" + a.getAdresse() + "\"," +
-                        "\"urlActions\": \"action" + a.getId_appart() + "\"," +
-                        "\"urlEdit\": \"./edit_appart/" + a.getId_appart() + "\"," +
-                        "\"urlSeeLoyer\": \"./loyer/" + a.getId_appart() + "\"," +
-                        "\"urlSeeEtat\": \"./etat/" + a.getId_appart() + "\"," +
-                        "\"urlSeeDepot\": \"./depot/" + a.getId_appart() + "\"}";
+                        "\"urlActions\": \"action" + a.getIdAppart() + "\"," +
+                        "\"urlEdit\": \"./edit_appart/" + a.getIdAppart() + "\"," +
+                        "\"urlSeeLoyer\": \"./loyer/" + a.getIdAppart() + "\"," +
+                        "\"urlSeeEtat\": \"./etat/" + a.getIdAppart() + "\"," +
+                        "\"urlSeeDepot\": \"./depot/" + a.getIdAppart() + "\"}";
             }
     }
 
     @PostMapping(value = "/createAppart", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @Secured({"ADMIN", "EMPLOYE"})
-    public String createAppart(
+    public String createApart(
             @RequestParam(name = "adressForm") String adresse,
             @RequestParam(name = "adressCompForm") String adresseComp,
             @RequestParam(name = "villeForm") String ville,
@@ -134,16 +134,16 @@ public class AppartController implements PathConfig {
                         if(dateCreation.getYear() <= LocalDate.now().getYear()) {
                             Integer montantFraisAgence = (montantLoyer * 8) / 100;
                             var appartement = Appartement.builder()
-                                    .id_loc(null)
+                                    .idAppart(null)
                                     .adresse(adresse)
-                                    .adresse_comp(adresseComp)
+                                    .adresseComp(adresseComp)
                                     .ville(ville)
-                                    .code_postal(codePostal)
-                                    .montant_loyer(montantLoyer)
-                                    .montant_charges(montantCharges)
-                                    .montant_depot_garantie(montantDepotGarantie)
-                                    .date_creation(dateCreation)
-                                    .montant_frais_agence(montantFraisAgence)
+                                    .codePostal(codePostal)
+                                    .montantLoyer(montantLoyer)
+                                    .montantCharges(montantCharges)
+                                    .montantDepotGarantie(montantDepotGarantie)
+                                    .dateCreation(dateCreation)
+                                    .montantFraisAgence(montantFraisAgence)
                                     .build();
                             appartService.createAppart(appartement);
                             // "Le profil du locataire a été créer avec succès."
@@ -173,7 +173,7 @@ public class AppartController implements PathConfig {
     @PostMapping(value = "/edit_appart", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @Secured({"ADMIN", "EMPLOYE"})
-    public String editAppart(
+    public String editApart(
             @RequestParam(name = "idLoc") @Nullable Integer idLoc,
             @RequestParam(name = "adresse") String adresse,
             @RequestParam(name = "loyer") Integer loyer,
@@ -184,31 +184,31 @@ public class AppartController implements PathConfig {
             Appartement a = appartService.getAppartByAdresse(adresse);
             boolean changeLoc = false;
 
-            if(a.getId_loc() == null) {
+            if(a.getIdLoc() == null) {
                 if(idLoc != null) {
                     changeLoc = true;
                 }
             } else {
-                if(!Objects.equals(idLoc, a.getId_loc().getId_loc()) || idLoc == null) {
+                if(!Objects.equals(idLoc, a.getIdLoc().getIdLoc()) || idLoc == null) {
                     changeLoc = true;
                 }
             }
 
-            if(Boolean.TRUE.equals(changeLoc) || !Objects.equals(loyer, a.getMontant_loyer()) ||
-                    !Objects.equals(charges, a.getMontant_charges()) || !Objects.equals(depotGarantie, a.getMontant_depot_garantie())) {
+            if(Boolean.TRUE.equals(changeLoc) || !Objects.equals(loyer, a.getMontantLoyer()) ||
+                    !Objects.equals(charges, a.getMontantCharges()) || !Objects.equals(depotGarantie, a.getMontantDepotGarantie())) {
                 if(loyer > 0 && charges > 0 && depotGarantie > 0) {
 
                     Integer montantFraisAgence = (loyer * 8) / 100;
-                    if((idLoc != null && a.getId_loc() != null) || (idLoc != null && a.getId_loc() == null)) {
-                        a.setId_loc(locataireService.getLocataireById(idLoc));
-                        a.getId_loc().setId_loc(idLoc);
-                    } else if(idLoc == null && a.getId_loc() != null) {
-                        a.setId_loc(null);
+                    if((idLoc != null && a.getIdLoc() != null) || (idLoc != null && a.getIdLoc() == null)) {
+                        a.setIdLoc(locataireService.getLocataireById(idLoc));
+                        a.getIdLoc().setIdLoc(idLoc);
+                    } else if(idLoc == null && a.getIdLoc() != null) {
+                        a.setIdLoc(null);
                     }
-                        a.setMontant_loyer(loyer);
-                        a.setMontant_charges(charges);
-                        a.setMontant_depot_garantie(depotGarantie);
-                        a.setMontant_frais_agence(montantFraisAgence);
+                        a.setMontantLoyer(loyer);
+                        a.setMontantCharges(charges);
+                        a.setMontantDepotGarantie(depotGarantie);
+                        a.setMontantFraisAgence(montantFraisAgence);
                     appartService.createAppart(a);
                     // "Les informations de l'appartement ont été modifier avec succès."
                     return "{\"success\": \"yes\"}";

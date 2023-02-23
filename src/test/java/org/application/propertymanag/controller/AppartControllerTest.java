@@ -41,8 +41,8 @@ public class AppartControllerTest {
     }
 
     @Test
-    public void getEditAppartTest() throws Exception {
-        Integer idAppart = appartService.getListOfApparts().get(0).getId_appart();
+    public void getEditApartTest() throws Exception {
+        Integer idAppart = appartService.getListOfApparts().get(0).getIdAppart();
         this.mockMvc.perform(get("/app/edit_appart/{idAppart}", idAppart))
                 .andExpect(status().isOk());
     }

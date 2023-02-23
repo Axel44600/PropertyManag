@@ -41,7 +41,7 @@ public class LocataireControllerTest {
     }
 
     @Test
-    public void getEditLocataireTest() throws Exception {
+    public void getEditLocTest() throws Exception {
         String lastName = locataireService.getListOfLocataires().get(0).getNom();
         this.mockMvc.perform(get("/app/edit_locataire/{lastName}", lastName))
                 .andExpect(status().isOk());

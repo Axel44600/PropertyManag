@@ -18,18 +18,19 @@ public class Locataire {
     @SequenceGenerator(name="loc_seq", sequenceName="loc_seq", allocationSize=1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="loc_seq")
     @Column(name="id_loc", updatable = false)
-    private Integer id_loc;
+    private Integer idLoc;
     private String nom;
     private String prenom;
     private String email;
     private String tel;
     private Integer solde;
-    public Integer getId_loc() {
-        return id_loc;
+
+    public Integer getIdLoc() {
+        return idLoc;
     }
 
-    public void setId_loc(Integer id_loc) {
-        this.id_loc = id_loc;
+    public void setIdLoc(Integer idLoc) {
+        this.idLoc = idLoc;
     }
 
     public String getNom() {

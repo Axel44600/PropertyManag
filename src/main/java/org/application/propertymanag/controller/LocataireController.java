@@ -38,7 +38,7 @@ public class LocataireController implements PathConfig {
     }
 
     @GetMapping("/edit_locataire/{lastName}")
-    public String getEditLocataire(@PathVariable(name = "lastName") String nom, Authentication authentication, HttpServletResponse response, Model model) throws IOException {
+    public String getEditLoc(@PathVariable(name = "lastName") String nom, Authentication authentication, HttpServletResponse response, Model model) throws IOException {
         if(locataireService.getLocataireByNom(nom) != null) {
             model.addAttribute("locataire", locataireService.getLocataireByNom(nom));
             model.addAttribute("appName", APP_NAME);
@@ -53,7 +53,7 @@ public class LocataireController implements PathConfig {
     @PostMapping(value = "/researchLoc", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @Secured({"ADMIN", "EMPLOYE"})
-    public String researchLocataire(@RequestParam(name = "name") String lastName) {
+    public String findLoc(@RequestParam(name = "name") String lastName) {
 
     String realLastName = mainService.maj(lastName);
     boolean lastNameFound = locataireService.getListOfLocataires().stream().anyMatch(locataire -> locataire.getNom().equals(realLastName));
@@ -62,7 +62,7 @@ public class LocataireController implements PathConfig {
             Locataire l = locataireService.getLocataireByNom(realLastName);
             return "{" +
                     "\"success\": \"yes\"," +
-                    "\"id\": \""+l.getId_loc()+"\"," +
+                    "\"id\": \""+l.getIdLoc()+"\"," +
                     "\"nom\": \""+l.getNom()+"\"," +
                     "\"prenom\": \""+l.getPrenom()+"\"," +
                     "\"email\": \""+l.getEmail()+"\"," +
@@ -75,7 +75,7 @@ public class LocataireController implements PathConfig {
     @PostMapping(value = "/home", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @Secured({"ADMIN", "EMPLOYE"})
-    public String createLocataire(
+    public String createLoc(
             @RequestParam(name = "lastName") String nom,
             @RequestParam(name = "firstName") String prenom,
             @RequestParam(name = "email") String email,
@@ -128,7 +128,7 @@ public class LocataireController implements PathConfig {
     @PostMapping(value = "/edit_locataire", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @Secured({"ADMIN", "EMPLOYE"})
-    public String editLocataire(
+    public String editLoc(
             @RequestParam(name = "lastName") String nom,
             @RequestParam(name = "firstName") String prenom,
             @RequestParam(name = "email") String email,

@@ -11,12 +11,12 @@ import java.util.List;
 @Repository
 public interface AppartRepository extends JpaRepository<Appartement, Integer> {
 
-    @Query(value = "SELECT a FROM Appartement a ORDER BY a.id_appart")
+    @Query(value = "SELECT a FROM Appartement a ORDER BY a.idAppart")
     @NotNull
     List<Appartement> findAll();
 
     Appartement findByAdresse(String adresse);
 
-    @Query(value = "SELECT ap FROM Appartement ap WHERE ap.id_loc.id_loc = ?1")
+    @Query(value = "SELECT ap FROM Appartement ap WHERE ap.idLoc.idLoc = ?1")
     Appartement findByIdLoc(Integer idLoc);
 }

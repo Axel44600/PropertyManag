@@ -19,34 +19,41 @@ public class Appartement {
     @SequenceGenerator(name="appart_seq", sequenceName="appart_seq", allocationSize=1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="appart_seq")
     @Column(name="id_appart", updatable = false)
-    private Integer id_appart;
+    private Integer idAppart;
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "id_loc", nullable = true)
-    private Locataire id_loc;
+    private Locataire idLoc;
     private String adresse;
-    private String adresse_comp;
+    @Column(name = "adresse_comp")
+    private String adresseComp;
     private String ville;
-    private Integer code_postal;
-    private Integer montant_loyer;
-    private Integer montant_charges;
-    private Integer montant_depot_garantie;
-    private LocalDate date_creation;
-    private Integer montant_frais_agence;
+    @Column(name = "code_postal")
+    private Integer codePostal;
+    @Column(name = "montant_loyer")
+    private Integer montantLoyer;
+    @Column(name = "montant_charges")
+    private Integer montantCharges;
+    @Column(name = "montant_depot_garantie")
+    private Integer montantDepotGarantie;
+    @Column(name = "date_creation")
+    private LocalDate dateCreation;
+    @Column(name = "montant_frais_agence")
+    private Integer montantFraisAgence;
 
-    public Integer getId_appart() {
-        return id_appart;
+    public Integer getIdAppart() {
+        return idAppart;
     }
 
-    public void setId_appart(Integer id_appart) {
-        this.id_appart = id_appart;
+    public void setIdAppart(Integer idAppart) {
+        this.idAppart = idAppart;
     }
 
-    public Locataire getId_loc() {
-        return id_loc;
+    public Locataire getIdLoc() {
+        return idLoc;
     }
 
-    public void setId_loc(Locataire id_loc) {
-        this.id_loc = id_loc;
+    public void setIdLoc(Locataire idLoc) {
+        this.idLoc = idLoc;
     }
 
     public String getAdresse() {
@@ -57,12 +64,12 @@ public class Appartement {
         this.adresse = adresse;
     }
 
-    public String getAdresse_comp() {
-        return adresse_comp;
+    public String getAdresseComp() {
+        return adresseComp;
     }
 
-    public void setAdresse_comp(String adresse_comp) {
-        this.adresse_comp = adresse_comp;
+    public void setAdresseComp(String adresseComp) {
+        this.adresseComp = adresseComp;
     }
 
     public String getVille() {
@@ -73,51 +80,51 @@ public class Appartement {
         this.ville = ville;
     }
 
-    public Integer getCode_postal() {
-        return code_postal;
+    public Integer getCodePostal() {
+        return codePostal;
     }
 
-    public void setCode_postal(Integer code_postal) {
-        this.code_postal = code_postal;
+    public void setCodePostal(Integer codePostal) {
+        this.codePostal = codePostal;
     }
 
-    public Integer getMontant_loyer() {
-        return montant_loyer;
+    public Integer getMontantLoyer() {
+        return montantLoyer;
     }
 
-    public void setMontant_loyer(Integer montant_loyer) {
-        this.montant_loyer = montant_loyer;
+    public void setMontantLoyer(Integer montantLoyer) {
+        this.montantLoyer = montantLoyer;
     }
 
-    public Integer getMontant_charges() {
-        return montant_charges;
+    public Integer getMontantCharges() {
+        return montantCharges;
     }
 
-    public void setMontant_charges(Integer montant_charges) {
-        this.montant_charges = montant_charges;
+    public void setMontantCharges(Integer montantCharges) {
+        this.montantCharges = montantCharges;
     }
 
-    public Integer getMontant_depot_garantie() {
-        return montant_depot_garantie;
+    public Integer getMontantDepotGarantie() {
+        return montantDepotGarantie;
     }
 
-    public void setMontant_depot_garantie(Integer montant_depot_garantie) {
-        this.montant_depot_garantie = montant_depot_garantie;
+    public void setMontantDepotGarantie(Integer montantDepotGarantie) {
+        this.montantDepotGarantie = montantDepotGarantie;
     }
 
-    public LocalDate getDate_creation() {
-        return date_creation;
+    public LocalDate getDateCreation() {
+        return dateCreation;
     }
 
-    public void setDate_creation(LocalDate date_creation) {
-        this.date_creation = date_creation;
+    public void setDateCreation(LocalDate dateCreation) {
+        this.dateCreation = dateCreation;
     }
 
-    public Integer getMontant_frais_agence() {
-        return montant_frais_agence;
+    public Integer getMontantFraisAgence() {
+        return montantFraisAgence;
     }
 
-    public void setMontant_frais_agence(Integer montant_frais_agence) {
-        this.montant_frais_agence = montant_frais_agence;
+    public void setMontantFraisAgence(Integer montantFraisAgence) {
+        this.montantFraisAgence = montantFraisAgence;
     }
 }

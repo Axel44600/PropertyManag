@@ -14,6 +14,7 @@ public interface AppartRepository extends JpaRepository<Appartement, Integer> {
     @Query(value = "SELECT a FROM Appartement a ORDER BY a.id_appart")
     @NotNull
     List<Appartement> findAll();
+
     Appartement findByAdresse(String adresse);
 
     @Query(value = "SELECT ap FROM Appartement ap WHERE ap.id_loc.id_loc = ?1")

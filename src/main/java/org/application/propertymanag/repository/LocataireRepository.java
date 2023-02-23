@@ -14,5 +14,6 @@ public interface LocataireRepository extends JpaRepository<Locataire, Integer> {
     @Query(value = "SELECT l FROM Locataire l ORDER BY l.id_loc")
     @NotNull
     List<Locataire> findAll();
+
     Locataire findByNom(String nom);
 }

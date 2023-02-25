@@ -11,4 +11,6 @@ public interface EtatService {
     List<EtatDesLieux> getListOfEtats();
 
     void createEtat(EtatDesLieux e);
+
+    EtatDesLieux getEtatByRef(String ref);
 }

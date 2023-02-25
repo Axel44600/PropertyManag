@@ -28,4 +28,9 @@ public class EtatServiceImpl implements EtatService {
     public void createEtat(EtatDesLieux e) {
         etatRepository.save(e);
     }
+
+    @Override
+    public EtatDesLieux getEtatByRef(String ref) {
+        return etatRepository.findByRef(ref);
+    }
 }

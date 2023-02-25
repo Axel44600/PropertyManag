@@ -4,8 +4,10 @@ import jakarta.annotation.Nullable;
 import jakarta.servlet.http.HttpServletResponse;
 import org.application.propertymanag.configuration.PathConfig;
 import org.application.propertymanag.entity.Appartement;
+import org.application.propertymanag.entity.EtatDesLieux;
 import org.application.propertymanag.entity.Locataire;
 import org.application.propertymanag.service.impl.AppartServiceImpl;
+import org.application.propertymanag.service.impl.EtatServiceImpl;
 import org.application.propertymanag.service.impl.LocataireServiceImpl;
 import org.application.propertymanag.service.impl.MainServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +32,8 @@ public class AppartController implements PathConfig {
     private LocataireServiceImpl locataireService;
     @Autowired
     private MainServiceImpl mainService;
+    @Autowired
+    private EtatServiceImpl etatService;
 
     @GetMapping("/appart")
     public String getHome(Model model) {
@@ -38,7 +42,7 @@ public class AppartController implements PathConfig {
         return "/app/appart/home";
     }
 
-    @GetMapping("/edit_appart/{idAppart}")
+    @GetMapping("/editAppart/{idAppart}")
     public String getEditApart(@PathVariable(name = "idAppart") Integer idAppart, HttpServletResponse response, Model model) throws IOException {
         try {
             Appartement appart = appartService.getAppartById(idAppart);
@@ -47,16 +51,13 @@ public class AppartController implements PathConfig {
 
             if(appart.getIdLoc() != null)  {
                 listOfLocataires = locataireService.getListOfLocataires().stream().filter(
-                        locataire -> !Objects.equals(locataire.getIdLoc(), appart.getIdLoc().getIdLoc()) &&
-                                appartService.getAppartByIdLocataire(locataire.getIdLoc()) == null).toList();
+                        locataire -> !Objects.equals(locataire.getIdLoc(), appart.getIdLoc().getIdLoc())).toList();
             } else {
-                listOfLocataires = locataireService.getListOfLocataires().stream().filter(
-                        locataire -> appartService.getAppartByIdLocataire(locataire.getIdLoc()) == null).toList();
+                listOfLocataires = locataireService.getListOfLocataires();
             }
             model.addAttribute("listOfLocataires", listOfLocataires);
             model.addAttribute("appName", APP_NAME);
             return "/app/appart/edit_appart";
-
         } catch (NoSuchElementException nSE) {
             response.sendRedirect("/app/home");
             return "/app/loc/home";
@@ -66,43 +67,22 @@ public class AppartController implements PathConfig {
     @PostMapping(value = "/researchAppart", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @Secured({"ADMIN", "EMPLOYE"})
-    public String findApart(@RequestParam(name = "addressOrNameL") String value) {
+    public String findApart(@RequestParam(name = "address") String value) {
+            boolean appartFound = appartService.getListOfApparts().stream().anyMatch(
+                    appartement -> appartement.getAdresse().equals(value));
 
-            String valueM = mainService.maj(value);
-            boolean[] appartFound = {false, false};
-            for (Appartement appart : appartService.getListOfApparts()) {
-                if(appart.getIdLoc() == null) {
-                    if (value.equals(appart.getAdresse())) {
-                        appartFound[0] = true;
-                    }
-                } else {
-                    if (value.equals(appart.getAdresse())) {
-                        appartFound[0] = true;
-                    } else if (valueM.equals(appart.getIdLoc().getNom())) {
-                        appartFound[1] = true;
-                    }
-                }
-            }
-
-            if (!appartFound[0] && !appartFound[1]) {
-                return "{" +
-                        "\"success\": \"no\"}";
+            if (!appartFound) {
+                return "{" + "\"success\": \"no\"}";
             } else {
-                Appartement a;
-                if (appartFound[0]) {
-                    a = appartService.getAppartByAdresse(value);
-                } else {
-                    Locataire l = locataireService.getLocataireByNom(valueM);
-                    a = appartService.getAppartByIdLocataire(l.getIdLoc());
-                }
+                Appartement a = appartService.getAppartByAdresse(value);
                 return "{" +
                         "\"success\": \"yes\"," +
                         "\"id\": \"" + a.getIdAppart() + "\"," +
                         "\"adresse\": \"" + a.getAdresse() + "\"," +
                         "\"urlActions\": \"action" + a.getIdAppart() + "\"," +
-                        "\"urlEdit\": \"./edit_appart/" + a.getIdAppart() + "\"," +
+                        "\"urlEdit\": \"./editAppart/" + a.getIdAppart() + "\"," +
                         "\"urlSeeLoyer\": \"./loyer/" + a.getIdAppart() + "\"," +
-                        "\"urlSeeEtat\": \"./etat/" + a.getIdAppart() + "\"," +
+                        "\"urlSeeEtat\": \"./appart/etat/" + a.getIdAppart() + "\"," +
                         "\"urlSeeDepot\": \"./depot/" + a.getIdAppart() + "\"}";
             }
     }
@@ -118,8 +98,7 @@ public class AppartController implements PathConfig {
             @RequestParam(name = "loyerForm") Integer montantLoyer,
             @RequestParam(name = "chargesForm") Integer montantCharges,
             @RequestParam(name = "depotGForm") Integer montantDepotGarantie,
-            @RequestParam(name = "dateForm") @DateTimeFormat(pattern= "yyyy-MM-dd") LocalDate dateCreation
-            ) {
+            @RequestParam(name = "dateForm") @DateTimeFormat(pattern= "yyyy-MM-dd") LocalDate dateCreation) {
 
         if (!adresse.isEmpty() && !ville.isEmpty() && dateCreation != null && codePostal != null &&
                 montantLoyer != null && montantCharges != null && montantDepotGarantie != null) {
@@ -170,7 +149,7 @@ public class AppartController implements PathConfig {
             }
     }
 
-    @PostMapping(value = "/edit_appart", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/editAppart", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @Secured({"ADMIN", "EMPLOYE"})
     public String editApart(
@@ -183,33 +162,83 @@ public class AppartController implements PathConfig {
         if(loyer != null && charges != null && depotGarantie != null) {
             Appartement a = appartService.getAppartByAdresse(adresse);
             boolean changeLoc = false;
+            boolean input = false;
+            boolean output = false;
 
-            if(a.getIdLoc() == null) {
-                if(idLoc != null) {
+            if(a.getIdLoc() == null) {  // LOCATAIRE ACTUEL : NON
+                if(idLoc != null) {  // NOUVEAU LOCATAIRE : OUI
                     changeLoc = true;
+                    input = true;
                 }
             } else {
-                if(!Objects.equals(idLoc, a.getIdLoc().getIdLoc()) || idLoc == null) {
+                if(!Objects.equals(idLoc, a.getIdLoc().getIdLoc()) && idLoc != null) { // LOCATAIRE ACTUEL = OUI --> NOUVEAU LOCATAIRE != DE CELUI ACTUEL
                     changeLoc = true;
+                    input = true;
+                    output = true;
+                } else if(idLoc == null) {
+                    changeLoc = true;
+                    output = true;
                 }
             }
 
-            if(Boolean.TRUE.equals(changeLoc) || !Objects.equals(loyer, a.getMontantLoyer()) ||
+            if(changeLoc || !Objects.equals(loyer, a.getMontantLoyer()) ||
                     !Objects.equals(charges, a.getMontantCharges()) || !Objects.equals(depotGarantie, a.getMontantDepotGarantie())) {
                 if(loyer > 0 && charges > 0 && depotGarantie > 0) {
 
                     Integer montantFraisAgence = (loyer * 8) / 100;
-                    if((idLoc != null && a.getIdLoc() != null) || (idLoc != null && a.getIdLoc() == null)) {
-                        a.setIdLoc(locataireService.getLocataireById(idLoc));
-                        a.getIdLoc().setIdLoc(idLoc);
-                    } else if(idLoc == null && a.getIdLoc() != null) {
+                    if((idLoc != null)) {
+                        if(a.getIdLoc() == null) {
+                            a.setIdLoc(locataireService.getLocataireById(idLoc));
+                            a.getIdLoc().setIdLoc(idLoc);
+                        } else {
+                            // DEMENAGEMENT
+                            String ref = "LOC_N" + a.getIdLoc().getIdLoc() + "_" + a.getIdLoc().getNom().toUpperCase() + "_" + a.getIdLoc().getPrenom().toUpperCase();
+                            if(output) {
+                                var etatOut = EtatDesLieux.builder()
+                                        .idAppart(a)
+                                        .type("Déménagement")
+                                        .ref(ref)
+                                        .build();
+                                etatService.createEtat(etatOut);
+                            }
+                            a.setIdLoc(locataireService.getLocataireById(idLoc));
+                            a.getIdLoc().setIdLoc(idLoc);
+                        }
+
+                    } else if(a.getIdLoc() != null) {
+                        // DEMENAGEMENT
+                        String ref = "LOC_N"+a.getIdLoc().getIdLoc()+"_"+a.getIdLoc().getNom().toUpperCase()+"_"+a.getIdLoc().getPrenom().toUpperCase();
+
+                        if(output) {
+                            var etatOut = EtatDesLieux.builder() // ADD ETAT DES LIEUX
+                                    .idAppart(a)
+                                    .type("Déménagement")
+                                    .ref(ref)
+                                    .build();
+                            etatService.createEtat(etatOut);
+                        }
+
                         a.setIdLoc(null);
                     }
                         a.setMontantLoyer(loyer);
                         a.setMontantCharges(charges);
                         a.setMontantDepotGarantie(depotGarantie);
                         a.setMontantFraisAgence(montantFraisAgence);
-                    appartService.createAppart(a);
+                        appartService.createAppart(a);
+
+                        if(idLoc != null) {
+                            // EMMENAGEMENT
+                            String ref = "LOC_N" + a.getIdLoc().getIdLoc() + "_" + a.getIdLoc().getNom().toUpperCase() + "_" + a.getIdLoc().getPrenom().toUpperCase();
+                            if (input) {
+                                var etatIn = EtatDesLieux.builder() // ADD ETAT DES LIEUX
+                                        .idAppart(a)
+                                        .type("Emménagement")
+                                        .ref(ref)
+                                        .build();
+                                etatService.createEtat(etatIn);
+                            }
+                        }
+
                     // "Les informations de l'appartement ont été modifier avec succès."
                     return "{\"success\": \"yes\"}";
                 } else {

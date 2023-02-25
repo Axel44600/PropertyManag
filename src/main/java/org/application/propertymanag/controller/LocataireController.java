@@ -37,7 +37,7 @@ public class LocataireController implements PathConfig {
         return "/app/loc/home";
     }
 
-    @GetMapping("/edit_locataire/{lastName}")
+    @GetMapping("/editLocataire/{lastName}")
     public String getEditLoc(@PathVariable(name = "lastName") String nom, Authentication authentication, HttpServletResponse response, Model model) throws IOException {
         if(locataireService.getLocataireByNom(nom) != null) {
             model.addAttribute("locataire", locataireService.getLocataireByNom(nom));
@@ -66,7 +66,7 @@ public class LocataireController implements PathConfig {
                     "\"nom\": \""+l.getNom()+"\"," +
                     "\"prenom\": \""+l.getPrenom()+"\"," +
                     "\"email\": \""+l.getEmail()+"\"," +
-                    "\"url\": \"./edit_locataire/"+l.getNom()+"\"}";
+                    "\"url\": \"./editLocataire/"+l.getNom()+"\"}";
         } else {
             return "{\"success\": \"no\"}";
         }
@@ -125,7 +125,7 @@ public class LocataireController implements PathConfig {
         }
     }
 
-    @PostMapping(value = "/edit_locataire", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/editLocataire", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @Secured({"ADMIN", "EMPLOYE"})
     public String editLoc(

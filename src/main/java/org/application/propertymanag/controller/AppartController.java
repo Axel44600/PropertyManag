@@ -164,6 +164,14 @@ public class AppartController implements PathConfig {
             boolean changeLoc = false;
             boolean input = false;
             boolean output = false;
+            String refEtatIn;
+            String refEtatOut;
+            EtatDesLieux etatOut = null;
+            String lastNameOldLoc = null;
+            String firstNameOldLoc = null;
+            EtatDesLieux etatIn = null;
+            String lastNameNewLoc = null;
+            String firstNameNewLoc = null;
 
             if(a.getIdLoc() == null) {  // LOCATAIRE ACTUEL : NON
                 if(idLoc != null) {  // NOUVEAU LOCATAIRE : OUI
@@ -192,14 +200,20 @@ public class AppartController implements PathConfig {
                             a.getIdLoc().setIdLoc(idLoc);
                         } else {
                             // DEMENAGEMENT
-                            String ref = "LOC_N" + a.getIdLoc().getIdLoc() + "_" + a.getIdLoc().getNom().toUpperCase() + "_" + a.getIdLoc().getPrenom().toUpperCase();
+                            refEtatOut = "LOC_N" + a.getIdLoc().getIdLoc() +
+                                            "_" + a.getIdLoc().getNom().toUpperCase() +
+                                            "_" + a.getIdLoc().getPrenom().toUpperCase() +
+                                            "_" + mainService.getRandomStr(10) + "_OUT";
                             if(output) {
-                                var etatOut = EtatDesLieux.builder()
+                                var etatOutBuild = EtatDesLieux.builder()
                                         .idAppart(a)
                                         .type("Déménagement")
-                                        .ref(ref)
+                                        .ref(refEtatOut)
                                         .build();
-                                etatService.createEtat(etatOut);
+                                etatService.createEtat(etatOutBuild);
+                                etatOut = etatService.getEtatByRef(refEtatOut);
+                                lastNameOldLoc = locataireService.getLocataireById(etatOut.getIdAppart().getIdLoc().getIdLoc()).getNom();
+                                firstNameOldLoc = locataireService.getLocataireById(etatOut.getIdAppart().getIdLoc().getIdLoc()).getPrenom();
                             }
                             a.setIdLoc(locataireService.getLocataireById(idLoc));
                             a.getIdLoc().setIdLoc(idLoc);
@@ -207,17 +221,21 @@ public class AppartController implements PathConfig {
 
                     } else if(a.getIdLoc() != null) {
                         // DEMENAGEMENT
-                        String ref = "LOC_N"+a.getIdLoc().getIdLoc()+"_"+a.getIdLoc().getNom().toUpperCase()+"_"+a.getIdLoc().getPrenom().toUpperCase();
-
+                        refEtatOut = "LOC_N"+a.getIdLoc().getIdLoc() +
+                                "_" + a.getIdLoc().getNom().toUpperCase() +
+                                "_" + a.getIdLoc().getPrenom().toUpperCase() +
+                                "_" + mainService.getRandomStr(10) + "_OUT";
                         if(output) {
-                            var etatOut = EtatDesLieux.builder() // ADD ETAT DES LIEUX
+                            var etatOutBuild = EtatDesLieux.builder() // ADD ETAT DES LIEUX
                                     .idAppart(a)
                                     .type("Déménagement")
-                                    .ref(ref)
+                                    .ref(refEtatOut)
                                     .build();
-                            etatService.createEtat(etatOut);
+                            etatService.createEtat(etatOutBuild);
+                            etatOut = etatService.getEtatByRef(refEtatOut);
+                            lastNameOldLoc = locataireService.getLocataireById(etatOut.getIdAppart().getIdLoc().getIdLoc()).getNom();
+                            firstNameOldLoc = locataireService.getLocataireById(etatOut.getIdAppart().getIdLoc().getIdLoc()).getPrenom();
                         }
-
                         a.setIdLoc(null);
                     }
                         a.setMontantLoyer(loyer);
@@ -228,19 +246,51 @@ public class AppartController implements PathConfig {
 
                         if(idLoc != null) {
                             // EMMENAGEMENT
-                            String ref = "LOC_N" + a.getIdLoc().getIdLoc() + "_" + a.getIdLoc().getNom().toUpperCase() + "_" + a.getIdLoc().getPrenom().toUpperCase();
+                            refEtatIn = "LOC_N" + a.getIdLoc().getIdLoc() +
+                                    "_" + a.getIdLoc().getNom().toUpperCase() +
+                                    "_" + a.getIdLoc().getPrenom().toUpperCase() +
+                                    "_" + mainService.getRandomStr(10) + "_IN";
                             if (input) {
-                                var etatIn = EtatDesLieux.builder() // ADD ETAT DES LIEUX
+                                var etatInBuild = EtatDesLieux.builder() // ADD ETAT DES LIEUX
                                         .idAppart(a)
                                         .type("Emménagement")
-                                        .ref(ref)
+                                        .ref(refEtatIn)
                                         .build();
-                                etatService.createEtat(etatIn);
+                                etatService.createEtat(etatInBuild);
+                                etatIn = etatService.getEtatByRef(refEtatIn);
+                                lastNameNewLoc = locataireService.getLocataireById(etatIn.getIdAppart().getIdLoc().getIdLoc()).getNom();
+                                firstNameNewLoc = locataireService.getLocataireById(etatIn.getIdAppart().getIdLoc().getIdLoc()).getPrenom();
                             }
                         }
 
-                    // "Les informations de l'appartement ont été modifier avec succès."
-                    return "{\"success\": \"yes\"}";
+                        if(changeLoc) {
+                            // "Les informations de l'appartement ont été modifier avec succès."
+                            String yes = "{\"success\": \"yes\",";
+                            if(etatOut != null && etatIn != null) {
+                                return yes +
+                                        "\"idEtatOut\": \"" + etatOut.getIdEtat() + "\"," +
+                                        "\"lastNameOldLoc\": \"" + lastNameOldLoc + "\"," +
+                                        "\"firstNameOldLoc\": \"" + firstNameOldLoc + "\"," +
+                                        "\"idEtatIn\": \"" + etatIn.getIdEtat() + "\"," +
+                                        "\"lastNameNewLoc\": \"" + lastNameNewLoc + "\"," +
+                                        "\"firstNameNewLoc\": \"" + firstNameNewLoc + "\"}";
+                            } else if(etatOut == null){
+                                assert etatIn != null;
+                                return yes +
+                                        "\"idEtatIn\": \"" + etatIn.getIdEtat() + "\"," +
+                                        "\"lastNameNewLoc\": \"" + lastNameNewLoc + "\"," +
+                                        "\"firstNameNewLoc\": \"" + firstNameNewLoc + "\"}";
+                            } else {
+                                return yes +
+                                        "\"idEtatOut\": \"" + etatOut.getIdEtat() + "\"," +
+                                        "\"lastNameOldLoc\": \"" + lastNameOldLoc + "\"," +
+                                        "\"firstNameOldLoc\": \"" + firstNameOldLoc + "\"}";
+                            }
+                        } else {
+                            // "Les informations de l'appartement ont été modifier avec succès."
+                            return "{\"success\": \"yes\"}";
+                        }
+
                 } else {
                     // "Les valeurs négatives ne sont pas autorisées."
                     return "{\"error\": \"one\"}";

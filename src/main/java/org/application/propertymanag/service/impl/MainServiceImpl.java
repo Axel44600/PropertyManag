@@ -66,4 +66,14 @@ public class MainServiceImpl implements MainService {
         }
     }
 
+    public String getRandomStr(int n) {
+        String str = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" + "abcdefghijklmnopqrstuvxyz";
+        StringBuilder s = new StringBuilder(n);
+        for (int i = 0; i < n; i++) {
+            int index = (int)(str.length() * Math.random());
+            s.append(str.charAt(index));
+        }
+        return s.toString();
+    }
+
 }

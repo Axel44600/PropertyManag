@@ -13,4 +13,6 @@ public interface MainService {
 
     public boolean verifFormatTel(String tel);
 
+    public String getRandomStr(int n);
+
 }

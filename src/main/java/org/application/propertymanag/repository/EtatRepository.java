@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 @Repository
 public interface EtatRepository extends JpaRepository<EtatDesLieux, Integer> {
-    @Query(value = "SELECT e FROM EtatDesLieux e ORDER BY e.idEtat")
+    @Query(value = "SELECT e FROM EtatDesLieux e ORDER BY e.idEtat DESC")
     @NotNull
     List<EtatDesLieux> findAll();
 

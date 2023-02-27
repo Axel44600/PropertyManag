@@ -4,12 +4,10 @@ import jakarta.annotation.Nullable;
 import jakarta.servlet.http.HttpServletResponse;
 import org.application.propertymanag.configuration.PathConfig;
 import org.application.propertymanag.entity.Appartement;
+import org.application.propertymanag.entity.DepotDeGarantie;
 import org.application.propertymanag.entity.EtatDesLieux;
 import org.application.propertymanag.entity.Locataire;
-import org.application.propertymanag.service.impl.AppartServiceImpl;
-import org.application.propertymanag.service.impl.EtatServiceImpl;
-import org.application.propertymanag.service.impl.LocataireServiceImpl;
-import org.application.propertymanag.service.impl.MainServiceImpl;
+import org.application.propertymanag.service.impl.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
@@ -34,6 +32,9 @@ public class AppartController implements PathConfig {
     private MainServiceImpl mainService;
     @Autowired
     private EtatServiceImpl etatService;
+    @Autowired
+    private GarantieServiceImpl garantieService;
+
 
     @GetMapping("/appart")
     public String getHome(Model model) {
@@ -260,6 +261,14 @@ public class AppartController implements PathConfig {
                                 etatIn = etatService.getEtatByRef(refEtatIn);
                                 lastNameNewLoc = locataireService.getLocataireById(etatIn.getIdAppart().getIdLoc().getIdLoc()).getNom();
                                 firstNameNewLoc = locataireService.getLocataireById(etatIn.getIdAppart().getIdLoc().getIdLoc()).getPrenom();
+
+                                var depotGarantieBuild = DepotDeGarantie.builder() // ADD DEPOT DE GARANTIE
+                                        .idAppart(a)
+                                        .montant(a.getMontantDepotGarantie())
+                                        .statut(false)
+                                        .ref(refEtatIn.substring(0, refEtatIn.length()-3))
+                                        .build();
+                                garantieService.createDepot(depotGarantieBuild);
                             }
                         }
 
@@ -272,12 +281,14 @@ public class AppartController implements PathConfig {
                                         "\"lastNameOldLoc\": \"" + lastNameOldLoc + "\"," +
                                         "\"firstNameOldLoc\": \"" + firstNameOldLoc + "\"," +
                                         "\"idEtatIn\": \"" + etatIn.getIdEtat() + "\"," +
+                                        "\"idAppart\": \"" + etatIn.getIdAppart().getIdAppart() + "\"," +
                                         "\"lastNameNewLoc\": \"" + lastNameNewLoc + "\"," +
                                         "\"firstNameNewLoc\": \"" + firstNameNewLoc + "\"}";
                             } else if(etatOut == null){
                                 assert etatIn != null;
                                 return yes +
                                         "\"idEtatIn\": \"" + etatIn.getIdEtat() + "\"," +
+                                        "\"idAppart\": \"" + etatIn.getIdAppart().getIdAppart() + "\"," +
                                         "\"lastNameNewLoc\": \"" + lastNameNewLoc + "\"," +
                                         "\"firstNameNewLoc\": \"" + firstNameNewLoc + "\"}";
                             } else {

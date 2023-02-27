@@ -70,7 +70,7 @@ public class EtatController implements PathConfig {
                 }
             }
 
-            if(validEdit) {
+            if(validEdit && !etat.getRef().contains("close")) {
                     DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
                     String dateF = dateFormat.format(date);
                     LocalDateTime dateTime = LocalDateTime.parse(dateF, dateFormat);
@@ -78,6 +78,11 @@ public class EtatController implements PathConfig {
                     etat.setDate(dateTime);
                     etat.setRemarques(remarques);
                     etatService.createEtat(etat);
+
+                    if(etat.getDate() != null && !etat.getRemarques().isEmpty()) {
+                        etat.setRef(String.valueOf(etat.getRef() + "_close"));
+                        etatService.createEtat(etat);
+                    }
                     // "Les informations de l'état des lieux ont été modifier avec succès."
                     return "{\"success\": \"yes\"}";
             } else {

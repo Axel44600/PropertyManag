@@ -82,9 +82,9 @@ public class AppartController implements PathConfig {
                         "\"adresse\": \"" + a.getAdresse() + "\"," +
                         "\"urlActions\": \"action" + a.getIdAppart() + "\"," +
                         "\"urlEdit\": \"./editAppart/" + a.getIdAppart() + "\"," +
-                        "\"urlSeeLoyer\": \"./loyer/" + a.getIdAppart() + "\"," +
+                        "\"urlSeeLoyer\": \"./appart/loyer/" + a.getIdAppart() + "\"," +
                         "\"urlSeeEtat\": \"./appart/etat/" + a.getIdAppart() + "\"," +
-                        "\"urlSeeDepot\": \"./depot/" + a.getIdAppart() + "\"}";
+                        "\"urlSeeDepot\": \"./appart/depotGarantie/" + a.getIdAppart() + "\"}";
             }
     }
 

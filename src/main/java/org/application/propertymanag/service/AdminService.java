@@ -6,11 +6,13 @@ import java.util.List;
 
 public interface AdminService {
 
-    List<Users> getListOfUsers();
+    Users getUserById(Integer id);
 
     Users getUserByNom(String nom);
 
     Users getUserByPseudo(String pseudo);
+
+    List<Users> getListOfUsers();
 
     void createUser(Users e);
 

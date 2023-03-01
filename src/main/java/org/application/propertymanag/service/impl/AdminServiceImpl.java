@@ -15,8 +15,8 @@ public class AdminServiceImpl implements AdminService {
     private UserRepository userRepository;
 
     @Override
-    public List<Users> getListOfUsers() {
-        return userRepository.findAll();
+    public Users getUserById(Integer id) {
+        return userRepository.findById(id).orElseThrow();
     }
 
     @Override
@@ -27,6 +27,11 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public Users getUserByPseudo(String pseudo) {
         return userRepository.findByPseudo(pseudo).orElseThrow();
+    }
+
+    @Override
+    public List<Users> getListOfUsers() {
+        return userRepository.findAll();
     }
 
     @Override

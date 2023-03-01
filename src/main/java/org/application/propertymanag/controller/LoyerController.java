@@ -99,7 +99,7 @@ public class LoyerController implements PathConfig {
 
         if (date != null && montant != null && statut != null && origine != null && idAppart != null) {
             Appartement a = appartService.getAppartById(idAppart);
-            boolean alReadyExist = false;
+            boolean alReadyExist;
 
             alReadyExist = loyerService.getListOfLoyers().stream().anyMatch(
                         loyer -> loyer.getIdAppart().getIdAppart().equals(a.getIdAppart()) &&

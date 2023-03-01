@@ -49,7 +49,8 @@ public class AuthenticationController implements PathConfig {
             @RequestParam(name = "password") String password,
             @RequestParam(name = "repassword") String repassword) {
 
-        boolean pseudoAlreadyUsed = service.getListOfUsers().stream().anyMatch(users -> users.getPseudo().equals(pseudo));
+        boolean pseudoAlreadyUsed = service.getListOfUsers().stream().anyMatch(
+                users -> users.getUsername() != null && users.getUsername().equals(pseudo));
         boolean validKey = service.getListOfUsers().stream().anyMatch(
                 users -> users.getRegisterKey() != null && users.getRegisterKey().equals(key));
 

@@ -1,15 +1,22 @@
 package org.application.propertymanag.controller;
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.application.propertymanag.configuration.PathConfig;
-import org.application.propertymanag.entity.Role;
-import org.application.propertymanag.entity.Users;
+import org.application.propertymanag.entity.*;
 import org.application.propertymanag.service.impl.AdminServiceImpl;
 import org.application.propertymanag.service.impl.MainServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.NoSuchElementException;
 
 @Controller
 @RequestMapping("/app/admin")
@@ -22,149 +29,187 @@ public class AdminController implements PathConfig {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @GetMapping("/index")
-    public String getIndexA(Model model) {
+    @GetMapping("/home")
+    public String getHome(Model model, Authentication auth) {
+        model.addAttribute("appName", APP_NAME);
+        model.addAttribute("user", adminService.getUserByPseudo(auth.getName()));
         model.addAttribute("listOfUsers", adminService.getListOfUsers());
-        return "/app/admin/index";
+        return "/app/admin/home";
     }
 
-    @GetMapping("/about-employe")
-    public String getAboutEmployeA() {
-        return "/app/admin/about-employe";
-    }
+    @GetMapping("/editUser/{id}")
+    public String getEditUser(@PathVariable(name = "id") Integer id, HttpServletResponse response, Model model) throws IOException {
+        try {
+            Users u = adminService.getUserById(id);
+            model.addAttribute("user", u);
+            List<Users> listOfUsers = adminService.getListOfUsers();
 
-    @GetMapping("/employe/{lastName}")
-    public String employe(@PathVariable(name = "lastName") String nom, Model m) {
-        m.addAttribute("e", adminService.getUserByNom(nom));
-        return "/app/admin/employe";
-    }
-
-    @GetMapping("/deleteEmploye/{lastName}")
-    public String getEmploye(@PathVariable(name = "lastName") String nom, Model m) {
-        Users u = adminService.getUserByNom(nom);
-        adminService.deleteUser(u);
-        m.addAttribute("msgSuccess", "Le compte employé à été supprimé avec succès !");
-        m.addAttribute("listOfEmployes", adminService.getListOfUsers());
-        return "/app/admin/index";
-    }
-
-    @PostMapping("/index")
-    public String searchEmploye(@RequestParam(name = "lastName") String nom, Model m) {
-        String errorMsg = null;
-
-        if(!nom.isEmpty()) {
-            String realNom = mainService.maj(nom);
-            if(adminService.getUserByNom(realNom) != null) {
-                m.addAttribute("employe", adminService.getUserByNom(realNom));
-                return "/app/admin/about-employe";
-            } else {
-                errorMsg = "Cet employé n'a pas été trouvé.";
-            }
-        } else {
-            errorMsg = "Veuillez saisir un nom";
+            model.addAttribute("listOfUsers", listOfUsers);
+            model.addAttribute("appName", APP_NAME);
+            return "/app/admin/edit_user";
+        } catch (NoSuchElementException nSE) {
+            response.sendRedirect("/app/home");
+            return "/app/admin/home";
         }
-        m.addAttribute("error", errorMsg);
-        m.addAttribute("listOfEmployes", adminService.getListOfUsers());
-        return "/app/admin/index";
     }
 
-    @PostMapping("/createEmploye")
-    public String createEmploye(
+    @PostMapping(value = "/researchUser", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    @Secured("ADMIN")
+    public String findUser(@RequestParam(name = "name") String nom, Authentication auth) {
+        String nomM = mainService.maj(nom);
+        boolean userFound = adminService.getListOfUsers().stream().anyMatch(
+              users -> users.getNom().equals(nomM));
+
+        if (userFound) {
+            Users u = adminService.getUserByNom(nomM);
+            String itsMe = "no";
+            if(u.getPseudo().equals(auth.getName())) {
+                itsMe = "yes";
+            }
+            return "{" +
+                    "\"success\": \"yes\"," +
+                    "\"id\": \"" + u.getId() + "\"," +
+                    "\"nom\": \"" + u.getNom() + "\"," +
+                    "\"prenom\": \"" + u.getPrenom() + "\"," +
+                    "\"pseudo\": \"" + u.getPseudo() + "\"," +
+                    "\"role\": \"" + u.getRole().name() + "\"," +
+                    "\"itsMe\": \"" + itsMe + "\"," +
+                    "\"urlEdit\": \"./editUser/" + u.getId() + "\"}";
+        } else {
+            return "{" + "\"success\": \"no\"}";
+        }
+    }
+
+    @PostMapping(value = "/createUser", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    @Secured("ADMIN")
+    public String createUser (
             @RequestParam(name = "lastName") String nom,
             @RequestParam(name = "firstName") String prenom,
-            @RequestParam(name = "poste") Role role,
-            Model m) {
-        String errorMsg = null;
-        String key = adminService.getRandomStr(25);
+            @RequestParam(name = "role") Role role) {
 
-        if(!nom.isEmpty() && !prenom.isEmpty()) {
+        if (!nom.isEmpty() && !prenom.isEmpty() && role != null) {
             String nomM = mainService.maj(nom);
             String prenomM = mainService.maj(prenom);
 
-            if(adminService.getUserByNom(nomM) == null) {
-                if(!mainService.verifDigit(nomM) && !mainService.verifDigit(prenomM)
-                        && !mainService.verifSpecialChar(nomM) && !mainService.verifSpecialChar(prenomM)) {
+            if (!mainService.verifDigit(nomM) && !mainService.verifDigit(prenomM)
+                    && !mainService.verifSpecialChar(nomM) && !mainService.verifSpecialChar(prenomM)) {
+                if (adminService.getUserByNom(nomM) == null) {
+
+                    String key = adminService.getRandomStr(25);
                     var user = Users.builder()
-                            .nom(nomM)
-                            .prenom(prenomM)
+                            .nom(nom)
+                            .prenom(prenom)
                             .role(role)
                             .registerKey(key)
                             .build();
                     adminService.createUser(user);
-                    m.addAttribute("key",
-                            "Le compte employé a été créer avec succès, voici la clé d'enregistrement : "+key);
-                    return "/app/admin/index";
+                    // "La session employé a été créer avec succès."
+                    // Voici la clé d'enregistrement à transmettre à l'employé concerné : key
+                    return "{\"success\": \"yes\"," +
+                            "\"key\": \"" + key + "\"}";
                 } else {
-                    errorMsg = "Le nom ou le prénom ne peut pas comporter de chiffres ni de caractères spéciaux.";
+                    // "Une session employé est déjà enregistré sous ce nom."
+                    return "{\"error\": \"one\"}";
                 }
             } else {
-                errorMsg = "Cet employé existe déjà.";
+                // "Le nom ou le prénom ne peut pas comporter de chiffres ni de caractères spéciaux."
+                return "{\"error\": \"two\"}";
             }
         } else {
-            errorMsg = "Veuillez remplir tous les champs du formulaire.";
+            // "Veuillez remplir tous les champs du formulaire."
+            return "{\"error\": \"three\"}";
         }
-        m.addAttribute("error", errorMsg);
-        m.addAttribute("listOfEmployes", adminService.getListOfUsers());
-        return "/app/admin/index";
     }
 
-    @PostMapping("/employe/editEmploye")
-    public String editEmploye(
+    @PostMapping(value = "/editUser", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    @Secured("ADMIN")
+    public String editUser(
+            @RequestParam(name = "id") Integer id,
             @RequestParam(name = "lastName") String nom,
-            @RequestParam(name = "pseudo") String pseudo,
-            @RequestParam(name = "poste") Role role,
+            @RequestParam(name = "firstName") String prenom,
             @RequestParam(name = "password") String password,
             @RequestParam(name = "repassword") String repass,
-            Model m) {
-        String errorMsg = null;
+            @RequestParam(name = "role") Role role) {
 
-        if(!nom.isEmpty() && !pseudo.isEmpty()) {
+        if(!nom.isEmpty() && !prenom.isEmpty() && !role.name().isEmpty()) {
+            Users user = adminService.getUserById(id);
             String nomM = mainService.maj(nom);
+            String prenomM = mainService.maj(prenom);
 
-                if(!mainService.verifDigit(nomM) && !mainService.verifSpecialChar(nomM)) {
-                    if(password.isEmpty() && repass.isEmpty()) {
+            if (!user.getNom().equals(nomM) || !user.getPrenom().equals(prenomM) ||
+                    !user.getRole().equals(role) || (!password.isEmpty() && !repass.isEmpty())) {
 
-                        if(mainService.verifSize(pseudo, 6) && mainService.verifMaj(pseudo) && mainService.verifDigit(pseudo)) {
-                            Users u = adminService.getUserByNom(nomM);
-                            u.setPseudo(pseudo);
-                            u.setRole(role);
-                            adminService.createUser(u);
-                            m.addAttribute("msgSuccess", "Le compte employé a été modifier avec succès !");
-                            return "/app/admin/index";
+                List<Users> listOfUsers = adminService.getListOfUsers().stream().filter(users -> !users.getId().equals(id)).toList();
+                boolean nomAlreadyUsed = listOfUsers.stream().anyMatch(users -> users.getNom().equals(nomM));
+
+                if (!nomAlreadyUsed) {
+                    if (!mainService.verifSpecialChar(nomM) && !mainService.verifSpecialChar(prenomM)) {
+                        if (!mainService.verifDigit(nomM) && !mainService.verifDigit(prenomM)) {
+
+                            if (password.isEmpty() && repass.isEmpty()) { // PAS DE CHANGEMENT DE MOT DE PASSE
+
+                                user.setNom(nomM);
+                                user.setPrenom(prenomM);
+                                user.setRole(role);
+                                adminService.createUser(user);
+                                // "Le compte utilisateur a été modifié avec succès."
+                                return "{\"success\": \"yes\"}";
+
+                            } else { // CHANGEMENT DE MOT DE PASSE
+
+                                if (mainService.verifSize(password, 8) && mainService.verifMaj(password)
+                                        && mainService.verifDigit(password) && mainService.verifSpecialChar(password)) {
+
+                                    if(password.equals(repass)) {
+                                        user.setNom(nomM);
+                                        user.setPrenom(prenomM);
+                                        user.setRole(role);
+                                        user.setPassword(passwordEncoder.encode(password));
+                                        adminService.createUser(user);
+                                        // "Le compte utilisateur a été modifié avec succès."
+                                        return "{\"success\": \"yes\"}";
+                                    } else {
+                                        // "Les mots de passe ne correspondent pas."
+                                        return "{\"error\": \"one\"}";
+                                    }
+                                } else {
+                                    // "Le format du mot de passe est incorrect, veuillez relire la notice."
+                                    return "{\"error\": \"two\"}";
+                                }
+                            }
+
                         } else {
-                            errorMsg = "Format du pseudonyme ou du mot de passe incorrect, veuillez relire la notice.";
+                            // "Le nom ainsi que le prénom ne peuvent pas comporter de chiffres."
+                            return "{\"error\": \"three\"}";
                         }
                     } else {
-                        if(mainService.verifSize(pseudo, 6) && mainService.verifSize(password, 8) &&
-                                mainService.verifMaj(pseudo) && mainService.verifMaj(password) &&
-                                mainService.verifDigit(pseudo) && mainService.verifDigit(password) &&
-                                mainService.verifSpecialChar(password)) {
-
-                            if(password.equals(repass)) {
-                                Users u = adminService.getUserByNom(nomM);
-                                u.setPseudo(pseudo);
-                                u.setPassword(passwordEncoder.encode((password)));
-                                u.setRole(role);
-                                adminService.createUser(u);
-                                m.addAttribute("msgSuccess", "Le compte employé a été modifier avec succès !");
-                                return "/app/admin/index";
-                            } else {
-                                errorMsg = " Les mots de passe ne correspondent pas.";
-                            }
-                        } else {
-                            errorMsg = "Format du pseudonyme ou du mot de passe incorrect, veuillez relire la notice.";
-                        }
+                        // "Le nom ainsi que le prénom ne peuvent pas comporter de caractères spéciaux."
+                        return "{\"error\": \"four\"}";
                     }
-
                 } else {
-                    errorMsg = "Le nom ou le prénom ne peut pas comporter de chiffres ni de caractères spéciaux.";
+                    // "Un utilisateur est déjà enregistré sous ce nom."
+                    return "{\"error\": \"five\"}";
                 }
+            } else {
+                return "{\"nochange\": \"yes\"}";
+            }
         } else {
-            errorMsg = "Veuillez remplir tous les champs du formulaire.";
+            // "Veuillez remplir tous les champs obligatoires du formulaire."
+            return "{\"error\": \"six\"}";
         }
-        m.addAttribute("error", errorMsg);
-        m.addAttribute("listOfEmployes", adminService.getListOfUsers());
-        return "/app/admin/index";
+
     }
 
+
+    @DeleteMapping(value = "/deleteUser")
+    public void deleteUser(@RequestParam("id") Integer id, HttpServletResponse response) throws IOException {
+        if(id != null && adminService.getUserById(id) != null) {
+            Users user = adminService.getUserById(id);
+            adminService.deleteUser(user);
+            response.sendRedirect("/app/admin/home");
+        }
+    }
 }

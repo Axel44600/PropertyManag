@@ -1,8 +1,12 @@
 package org.application.propertymanag.controller;
 
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import org.application.propertymanag.configuration.PathConfig;
 import org.application.propertymanag.entity.Locataire;
+import org.application.propertymanag.form.locataire.CreateLocForm;
+import org.application.propertymanag.form.locataire.UpdateLocForm;
+import org.application.propertymanag.form.validator.LocataireValidator;
 import org.application.propertymanag.service.impl.AdminServiceImpl;
 import org.application.propertymanag.service.impl.LocataireServiceImpl;
 import org.application.propertymanag.service.impl.MainServiceImpl;
@@ -12,22 +16,27 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.Objects;
 
 @Controller
 @RequestMapping("/app")
 public class LocataireController implements PathConfig {
 
-    @Autowired
     private AdminServiceImpl adminService;
-
-    @Autowired
     private LocataireServiceImpl locataireService;
+    private MainServiceImpl mainService;
+    private final LocataireValidator validator = new LocataireValidator();
 
     @Autowired
-    private MainServiceImpl mainService;
+    public void setInjectedBean(AdminServiceImpl adminService, LocataireServiceImpl locataireService, MainServiceImpl mainService) {
+        this.adminService = adminService;
+        this.locataireService = locataireService;
+        this.mainService = mainService;
+    }
 
     @GetMapping("/home")
     public String getHome(Authentication authentication, Model model) {
@@ -55,8 +64,8 @@ public class LocataireController implements PathConfig {
     @Secured({"ADMIN", "EMPLOYE"})
     public String findLoc(@RequestParam(name = "name") String lastName) {
 
-    String realLastName = mainService.maj(lastName);
-    boolean lastNameFound = locataireService.getListOfLocataires().stream().anyMatch(locataire -> locataire.getNom().equals(realLastName));
+        String realLastName = mainService.maj(lastName);
+        boolean lastNameFound = locataireService.getListOfLocataires().stream().anyMatch(locataire -> locataire.getNom().equals(realLastName));
 
         if(lastNameFound){
             Locataire l = locataireService.getLocataireByNom(realLastName);
@@ -75,110 +84,26 @@ public class LocataireController implements PathConfig {
     @PostMapping(value = "/home", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @Secured({"ADMIN", "EMPLOYE"})
-    public String createLoc(
-            @RequestParam(name = "lastName") String nom,
-            @RequestParam(name = "firstName") String prenom,
-            @RequestParam(name = "email") String email,
-            @RequestParam(name = "tel") String tel) {
-
-        if (!nom.isEmpty() && !prenom.isEmpty() && !email.isEmpty() && !tel.isEmpty()) {
-            String nomM = mainService.maj(nom);
-            String prenomM = mainService.maj(prenom);
-
-            boolean telAlreadyUsed = locataireService.getListOfLocataires().stream().anyMatch(locataire -> locataire.getTel().equals(tel));
-            if (locataireService.getLocataireByNom(nomM) == null && !telAlreadyUsed) {
-                if (!mainService.verifDigit(nomM) && !mainService.verifDigit(prenomM)
-                        && !mainService.verifSpecialChar(nomM) && !mainService.verifSpecialChar(prenomM)) {
-
-                    boolean emailAlreadyUsed = locataireService.getListOfLocataires().stream().anyMatch(locataire -> locataire.getEmail().equals(email));
-                    if(!emailAlreadyUsed) {
-                        if(mainService.verifFormatTel(tel) && !mainService.verifSpecialChar(tel)) {
-                            var locataire = Locataire.builder()
-                                    .nom(nomM)
-                                    .prenom(prenomM)
-                                    .email(email)
-                                    .tel(tel)
-                                    .solde(0)
-                                    .build();
-                            locataireService.createLocataire(locataire);
-                            // "Le profil du locataire a été créer avec succès."
-                            return "{\"success\": \"yes\"}";
-                        } else {
-                            // "Le numéro de téléphone ne peut comporter que des chiffres."
-                            return "{\"error\": \"one\"}";
-                        }
-                    } else {
-                        // "Un locataire possède déjà cette adresse email."
-                        return "{\"error\": \"two\"}";
-                    }
-                } else {
-                    // "Le nom ou le prénom ne peut pas comporter de chiffres ni de caractères spéciaux."
-                    return "{\"error\": \"three\"}";
-                }
-            } else {
-                // "Ce profil locataire existe déjà."
-                return "{\"error\": \"four\"}";
-            }
+    public String createLoc(@ModelAttribute @Valid CreateLocForm form, BindingResult bindingResult){
+        if(bindingResult.hasErrors()) {
+            return "{\"error\": \"three\"," +
+                    "\"msgError\": \"" + Objects.requireNonNull(bindingResult.getFieldError()).getDefaultMessage() + "\"}";
         } else {
-            // "Veuillez remplir tous les champs du formulaire."
-            return "{\"error\": \"five\"}";
+            return validator.createLoc(mainService, locataireService, form);
         }
     }
 
     @PostMapping(value = "/editLocataire", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @Secured({"ADMIN", "EMPLOYE"})
-    public String editLoc(
-            @RequestParam(name = "lastName") String nom,
-            @RequestParam(name = "firstName") String prenom,
-            @RequestParam(name = "email") String email,
-            @RequestParam(name = "tel") String tel,
-            @RequestParam(name = "solde") Integer solde) {
-
-        if(!nom.isEmpty() && !prenom.isEmpty() && !email.isEmpty() && !tel.isEmpty()) {
-            String prenomM = mainService.maj(prenom);
-
-            Locataire locat = locataireService.getLocataireByNom(nom);
-            if(prenomM.equals(locat.getPrenom()) && email.equals(locat.getEmail()) && tel.equals(locat.getTel()) && solde.equals(locat.getSolde())) {
-                return "{\"nochange\": \"yes\"}";
-            } else {
-                boolean telAlreadyUsed = locataireService.getListOfLocataires().stream().anyMatch(
-                        locataire -> !locataire.getTel().equals(locat.getTel()) && locataire.getTel().equals(tel));
-                if(!telAlreadyUsed) {
-                    if (!mainService.verifDigit(prenomM) && !mainService.verifSpecialChar(prenomM)) {
-
-                        boolean emailAlreadyUsed = locataireService.getListOfLocataires().stream().anyMatch(
-                                locataire -> locataire.getEmail().equals(email) && !locataire.getNom().equals(nom));
-                        if (!emailAlreadyUsed) {
-                            if (mainService.verifFormatTel(tel) && !mainService.verifSpecialChar(tel)) {
-                                Locataire l = locataireService.getLocataireByNom(nom);
-                                l.setPrenom(prenomM);
-                                l.setEmail(email);
-                                l.setTel(tel);
-                                l.setSolde(solde);
-                                locataireService.createLocataire(l);
-                                // "Le profil du locataire a été modifier avec succès."
-                                return "{\"success\": \"yes\"}";
-                            } else {
-                                // "Le numéro de téléphone ne peut comporter que des chiffres."
-                                return "{\"error\": \"one\"}";
-                            }
-                        } else {
-                            // "Un locataire possède déjà cette adresse email."
-                            return "{\"error\": \"two\"}";
-                        }
-                    } else {
-                        // "Le prénom ne peut pas comporter de chiffres ni de caractères spéciaux."
-                        return "{\"error\": \"three\"}";
-                    }
-                } else {
-                    // "Un locataire possède déjà ce numéro de téléphone."
-                    return "{\"error\": \"four\"}";
-                }
-            }
+    public String editLoc(@ModelAttribute @Valid UpdateLocForm form, BindingResult bindingResult) {
+        if(bindingResult.hasErrors()) {
+            return "{\"error\": \"three\"," +
+                    "\"msgError\": \"" + Objects.requireNonNull(bindingResult.getFieldError()).getDefaultMessage() + "\"}";
         } else {
-            // "Veuillez saisir tous les champs du formulaire."
-            return "{\"status\": \"five\"}";
+            return validator.editLoc(mainService, locataireService, form);
         }
 }
+
+
 }

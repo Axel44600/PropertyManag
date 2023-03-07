@@ -1,33 +1,40 @@
 package org.application.propertymanag.controller;
 
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import org.application.propertymanag.configuration.PathConfig;
 import org.application.propertymanag.entity.*;
-import org.application.propertymanag.service.impl.AdminServiceImpl;
-import org.application.propertymanag.service.impl.MainServiceImpl;
+import org.application.propertymanag.form.admin.CreateUserForm;
+import org.application.propertymanag.form.admin.UpdateUserForm;
+import org.application.propertymanag.form.validator.AdminValidator;
+import org.application.propertymanag.service.impl.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 
 @Controller
 @RequestMapping("/app/admin")
 public class AdminController implements PathConfig {
 
-    @Autowired
     private AdminServiceImpl adminService;
-    @Autowired
     private MainServiceImpl mainService;
+    private final AdminValidator validator = new AdminValidator();
+
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    public void setInjectedBean(AdminServiceImpl adminService, MainServiceImpl mainService) {
+        this.adminService = adminService;
+        this.mainService = mainService;
+    }
 
     @GetMapping("/home")
     public String getHome(Model model, Authentication auth) {
@@ -84,125 +91,26 @@ public class AdminController implements PathConfig {
     @PostMapping(value = "/createUser", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @Secured("ADMIN")
-    public String createUser (
-            @RequestParam(name = "lastName") String nom,
-            @RequestParam(name = "firstName") String prenom,
-            @RequestParam(name = "role") Role role) {
-
-        if (!nom.isEmpty() && !prenom.isEmpty() && role != null) {
-            String nomM = mainService.maj(nom);
-            String prenomM = mainService.maj(prenom);
-
-            if (!mainService.verifDigit(nomM) && !mainService.verifDigit(prenomM)
-                    && !mainService.verifSpecialChar(nomM) && !mainService.verifSpecialChar(prenomM)) {
-                if (adminService.getUserByNom(nomM) == null) {
-
-                    String key = adminService.getRandomStr(25);
-                    var user = Users.builder()
-                            .nom(nom)
-                            .prenom(prenom)
-                            .role(role)
-                            .registerKey(key)
-                            .build();
-                    adminService.createUser(user);
-                    // "La session employé a été créer avec succès."
-                    // Voici la clé d'enregistrement à transmettre à l'employé concerné : key
-                    return "{\"success\": \"yes\"," +
-                            "\"key\": \"" + key + "\"}";
-                } else {
-                    // "Une session employé est déjà enregistré sous ce nom."
-                    return "{\"error\": \"one\"}";
-                }
-            } else {
-                // "Le nom ou le prénom ne peut pas comporter de chiffres ni de caractères spéciaux."
-                return "{\"error\": \"two\"}";
-            }
+    public String createUser (@ModelAttribute @Valid CreateUserForm form, BindingResult bindingResult) {
+        if(bindingResult.hasErrors()) {
+            return "{\"error\": \"two\"," +
+                    "\"msgError\": \"" + Objects.requireNonNull(bindingResult.getFieldError()).getDefaultMessage() + "\"}";
         } else {
-            // "Veuillez remplir tous les champs du formulaire."
-            return "{\"error\": \"three\"}";
+            return validator.createUser(adminService, mainService, form);
         }
     }
 
     @PostMapping(value = "/editUser", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @Secured("ADMIN")
-    public String editUser(
-            @RequestParam(name = "id") Integer id,
-            @RequestParam(name = "lastName") String nom,
-            @RequestParam(name = "firstName") String prenom,
-            @RequestParam(name = "password") String password,
-            @RequestParam(name = "repassword") String repass,
-            @RequestParam(name = "role") Role role) {
-
-        if(!nom.isEmpty() && !prenom.isEmpty() && !role.name().isEmpty()) {
-            Users user = adminService.getUserById(id);
-            String nomM = mainService.maj(nom);
-            String prenomM = mainService.maj(prenom);
-
-            if (!user.getNom().equals(nomM) || !user.getPrenom().equals(prenomM) ||
-                    !user.getRole().equals(role) || (!password.isEmpty() && !repass.isEmpty())) {
-
-                List<Users> listOfUsers = adminService.getListOfUsers().stream().filter(users -> !users.getId().equals(id)).toList();
-                boolean nomAlreadyUsed = listOfUsers.stream().anyMatch(users -> users.getNom().equals(nomM));
-
-                if (!nomAlreadyUsed) {
-                    if (!mainService.verifSpecialChar(nomM) && !mainService.verifSpecialChar(prenomM)) {
-                        if (!mainService.verifDigit(nomM) && !mainService.verifDigit(prenomM)) {
-
-                            if (password.isEmpty() && repass.isEmpty()) { // PAS DE CHANGEMENT DE MOT DE PASSE
-
-                                user.setNom(nomM);
-                                user.setPrenom(prenomM);
-                                user.setRole(role);
-                                adminService.createUser(user);
-                                // "Le compte utilisateur a été modifié avec succès."
-                                return "{\"success\": \"yes\"}";
-
-                            } else { // CHANGEMENT DE MOT DE PASSE
-
-                                if (mainService.verifSize(password, 8) && mainService.verifMaj(password)
-                                        && mainService.verifDigit(password) && mainService.verifSpecialChar(password)) {
-
-                                    if(password.equals(repass)) {
-                                        user.setNom(nomM);
-                                        user.setPrenom(prenomM);
-                                        user.setRole(role);
-                                        user.setPassword(passwordEncoder.encode(password));
-                                        adminService.createUser(user);
-                                        // "Le compte utilisateur a été modifié avec succès."
-                                        return "{\"success\": \"yes\"}";
-                                    } else {
-                                        // "Les mots de passe ne correspondent pas."
-                                        return "{\"error\": \"one\"}";
-                                    }
-                                } else {
-                                    // "Le format du mot de passe est incorrect, veuillez relire la notice."
-                                    return "{\"error\": \"two\"}";
-                                }
-                            }
-
-                        } else {
-                            // "Le nom ainsi que le prénom ne peuvent pas comporter de chiffres."
-                            return "{\"error\": \"three\"}";
-                        }
-                    } else {
-                        // "Le nom ainsi que le prénom ne peuvent pas comporter de caractères spéciaux."
-                        return "{\"error\": \"four\"}";
-                    }
-                } else {
-                    // "Un utilisateur est déjà enregistré sous ce nom."
-                    return "{\"error\": \"five\"}";
-                }
-            } else {
-                return "{\"nochange\": \"yes\"}";
-            }
+    public String editUser(@ModelAttribute @Valid UpdateUserForm form, BindingResult bindingResult) {
+        if(bindingResult.hasErrors()) {
+            return "{\"error\": \"two\"," +
+                        "\"msgError\": \"" + Objects.requireNonNull(bindingResult.getFieldError()).getDefaultMessage() + "\"}";
         } else {
-            // "Veuillez remplir tous les champs obligatoires du formulaire."
-            return "{\"error\": \"six\"}";
+            return validator.editUser(adminService, mainService, form);
         }
-
     }
-
 
     @DeleteMapping(value = "/deleteUser")
     public void deleteUser(@RequestParam("id") Integer id, HttpServletResponse response) throws IOException {

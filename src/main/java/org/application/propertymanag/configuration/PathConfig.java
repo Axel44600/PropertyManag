@@ -6,5 +6,6 @@ public interface PathConfig {
     String PATH = "http://localhost";
     String APP_PATH = "/app";
     String ADMIN_PATH = "app/admin";
+    Integer FRAIS_AGENCE = 8;
 
 }

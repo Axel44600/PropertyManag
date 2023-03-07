@@ -136,10 +136,33 @@ public class AppartValidator {
         }
 
         if (valueBool[0] || !loyer.equals(a.getMontantLoyer()) || !charges.equals(a.getMontantCharges()) || !depotGarantie.equals(a.getMontantDepotGarantie())) {
-            Integer montantFraisAgence = (loyer * FRAIS_AGENCE) / 100;
+            if(a.getIdLoc() == null || a.getIdLoc().getSolde() >= 0) {
 
+            Integer montantFraisAgence = (loyer * FRAIS_AGENCE) / 100;
             if ((idLoc != null)) {
                 if (a.getIdLoc() != null && (valueBool[2])) { // DEMENAGEMENT
+                        valueStr[1] = addRef(mainService, a, false);
+
+                        // ADD ETAT DES LIEUX
+                        valueEtat[0] = addEtat(appartService, a, valueStr[1], false);
+
+                        // ADD BILAN DES COMPTES
+                        addBilan(appartService, a);
+                        for(Loyer l : appartService.getListOfLoyers()) {
+                            if(l.getIdAppart().getIdAppart().equals(a.getIdAppart())) {
+                                appartService.deleteLoyer(l);
+                            }
+                        }
+
+                        valueStr[2] = locataireService.getLocataireById(valueEtat[0].getIdAppart().getIdLoc().getIdLoc()).getNom();
+                        valueStr[3] = locataireService.getLocataireById(valueEtat[0].getIdAppart().getIdLoc().getIdLoc()).getPrenom();
+                    }
+
+                a.setIdLoc(locataireService.getLocataireById(idLoc));
+                a.getIdLoc().setIdLoc(idLoc);
+
+            } else if(a.getIdLoc() != null) {  // DEMENAGEMENT
+
                     valueStr[1] = addRef(mainService, a, false);
 
                     // ADD ETAT DES LIEUX
@@ -147,31 +170,23 @@ public class AppartValidator {
 
                     // ADD BILAN DES COMPTES
                     addBilan(appartService, a);
-
+                    for(Loyer l : appartService.getListOfLoyers()) {
+                        if(l.getIdAppart().getIdAppart().equals(a.getIdAppart())) {
+                            appartService.deleteLoyer(l);
+                        }
+                    }
                     valueStr[2] = locataireService.getLocataireById(valueEtat[0].getIdAppart().getIdLoc().getIdLoc()).getNom();
                     valueStr[3] = locataireService.getLocataireById(valueEtat[0].getIdAppart().getIdLoc().getIdLoc()).getPrenom();
-                }
-                a.setIdLoc(locataireService.getLocataireById(idLoc));
-                a.getIdLoc().setIdLoc(idLoc);
 
-            } else if (a.getIdLoc() != null) {  // DEMENAGEMENT
-                valueStr[1] = addRef(mainService, a, false);
-
-                // ADD ETAT DES LIEUX
-                valueEtat[0] = addEtat(appartService, a, valueStr[1], false);
-
-                // ADD BILAN DES COMPTES
-                addBilan(appartService, a);
-                valueStr[2] = locataireService.getLocataireById(valueEtat[0].getIdAppart().getIdLoc().getIdLoc()).getNom();
-                valueStr[3] = locataireService.getLocataireById(valueEtat[0].getIdAppart().getIdLoc().getIdLoc()).getPrenom();
-
-                a.setIdLoc(null);
+                    a.setIdLoc(null);
             }
-            a.setMontantLoyer(loyer);
-            a.setMontantCharges(charges);
-            a.setMontantDepotGarantie(depotGarantie);
-            a.setMontantFraisAgence(montantFraisAgence);
-            appartService.createAppart(a);
+
+                a.setMontantLoyer(loyer);
+                a.setMontantCharges(charges);
+                a.setMontantDepotGarantie(depotGarantie);
+                a.setMontantFraisAgence(montantFraisAgence);
+                appartService.createAppart(a);
+
 
             if (idLoc != null && valueBool[1]) { // EMMENAGEMENT
                 valueStr[0] = addRef(mainService, a, true);
@@ -186,37 +201,42 @@ public class AppartValidator {
                 addDepot(appartService, a, valueStr[0]);
             }
 
-            if (valueBool[0]) {
-                // "Les informations de l'appartement ont été modifier avec succès."
 
-                // Déménagement et emménagement
-                if (valueEtat[0] != null && valueEtat[1] != null) {
-                    result = "{\"success\": \"yes\"," +
-                            "\"idEtatOut\": \"" + valueEtat[0].getIdEtat() + "\"," +
-                            "\"lastNameOldLoc\": \"" + valueStr[2] + "\"," +
-                            "\"firstNameOldLoc\": \"" + valueStr[3] + "\"," +
-                            "\"idEtatIn\": \"" + valueEtat[1].getIdEtat() + "\"," +
-                            "\"idAppart\": \"" + valueEtat[1].getIdAppart().getIdAppart() + "\"," +
-                            "\"lastNameNewLoc\": \"" + valueStr[4] + "\"," +
-                            "\"firstNameNewLoc\": \"" + valueStr[5] + "\"}";
-                } else if (valueEtat[0] == null) {
-                    // Emménagement
-                    assert valueEtat[1] != null;
-                    result = "{\"success\": \"yes\"," +
-                            "\"idEtatIn\": \"" + valueEtat[1].getIdEtat() + "\"," +
-                            "\"idAppart\": \"" + valueEtat[1].getIdAppart().getIdAppart() + "\"," +
-                            "\"lastNameNewLoc\": \"" + valueStr[4] + "\"," +
-                            "\"firstNameNewLoc\": \"" + valueStr[5] + "\"}";
+                if (valueBool[0]) {
+                    // "Les informations de l'appartement ont été modifier avec succès."
+
+                    // Déménagement et emménagement
+                    if (valueEtat[0] != null && valueEtat[1] != null) {
+                        result = "{\"success\": \"yes\"," +
+                                "\"idEtatOut\": \"" + valueEtat[0].getIdEtat() + "\"," +
+                                "\"lastNameOldLoc\": \"" + valueStr[2] + "\"," +
+                                "\"firstNameOldLoc\": \"" + valueStr[3] + "\"," +
+                                "\"idEtatIn\": \"" + valueEtat[1].getIdEtat() + "\"," +
+                                "\"idAppart\": \"" + valueEtat[1].getIdAppart().getIdAppart() + "\"," +
+                                "\"lastNameNewLoc\": \"" + valueStr[4] + "\"," +
+                                "\"firstNameNewLoc\": \"" + valueStr[5] + "\"}";
+                    } else if (valueEtat[0] == null) {
+                        // Emménagement
+                        assert valueEtat[1] != null;
+                        result = "{\"success\": \"yes\"," +
+                                "\"idEtatIn\": \"" + valueEtat[1].getIdEtat() + "\"," +
+                                "\"idAppart\": \"" + valueEtat[1].getIdAppart().getIdAppart() + "\"," +
+                                "\"lastNameNewLoc\": \"" + valueStr[4] + "\"," +
+                                "\"firstNameNewLoc\": \"" + valueStr[5] + "\"}";
+                    } else {
+                        // Déménagement
+                        result = "{\"success\": \"yes\"," +
+                                "\"idEtatOut\": \"" + valueEtat[0].getIdEtat() + "\"," +
+                                "\"lastNameOldLoc\": \"" + valueStr[2] + "\"," +
+                                "\"firstNameOldLoc\": \"" + valueStr[3] + "\"}";
+                    }
                 } else {
-                    // Déménagement
-                    result = "{\"success\": \"yes\"," +
-                            "\"idEtatOut\": \"" + valueEtat[0].getIdEtat() + "\"," +
-                            "\"lastNameOldLoc\": \"" + valueStr[2] + "\"," +
-                            "\"firstNameOldLoc\": \"" + valueStr[3] + "\"}";
+                    // "Les informations de l'appartement ont été modifier avec succès."
+                    result = "{\"success\": \"yes\"}";
                 }
             } else {
-                // "Les informations de l'appartement ont été modifier avec succès."
-                result = "{\"success\": \"yes\"}";
+                // "Opération impossible, le locataire actuel n'est pas en règle sur le paiement de ses loyers."
+                result = "{\"error\": \"one\"}";
             }
         } else {
             result = "{\"nochange\": true}";

@@ -75,7 +75,8 @@ public class LocataireController implements PathConfig {
                     "\"nom\": \""+l.getNom()+"\"," +
                     "\"prenom\": \""+l.getPrenom()+"\"," +
                     "\"email\": \""+l.getEmail()+"\"," +
-                    "\"url\": \"./editLocataire/"+l.getNom()+"\"}";
+                    "\"url\": \"./editLocataire/"+l.getNom()+"\"," +
+                    "\"urlBilan\": \"./bilan/"+l.getNom()+"\"}";
         } else {
             return "{\"success\": \"no\"}";
         }

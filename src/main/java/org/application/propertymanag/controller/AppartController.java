@@ -104,7 +104,7 @@ public class AppartController implements PathConfig {
     @Secured({"ADMIN", "EMPLOYE"})
     public String editApart(@ModelAttribute @Valid UpdateAppartForm form, BindingResult bindingResult) {
         if(bindingResult.hasErrors()) {
-            return "{\"error\": \"one\"," +
+            return "{\"error\": \"two\"," +
                     "\"msgError\": \"" + Objects.requireNonNull(bindingResult.getFieldError()).getDefaultMessage() + "\"}";
         } else {
             return validator.editAppart(appartService, locataireService, mainService, form);

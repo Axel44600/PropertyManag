@@ -1,7 +1,6 @@
 package org.application.propertymanag.controller;
 
 import org.application.propertymanag.service.AppartService;
-import org.application.propertymanag.service.impl.LoyerServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,15 +20,9 @@ public class LoyerControllerTest {
 
     @Autowired
     WebApplicationContext context;
-
     @Autowired
     AppartService appartService;
-
-    @Autowired
-    LoyerServiceImpl loyerService;
-
     private MockMvc mockMvc;
-
     @BeforeEach
     public void setup() {
         mockMvc = MockMvcBuilders.webAppContextSetup(context)
@@ -46,7 +39,7 @@ public class LoyerControllerTest {
 
     @Test
     public void getEditLoyerTest() throws Exception {
-        Integer idLoyer = loyerService.getListOfLoyers().get(0).getIdLoyer();
+        Integer idLoyer = appartService.getListOfLoyers().get(0).getIdLoyer();
         this.mockMvc.perform(MockMvcRequestBuilders.get("/app/appart/loyer/editLoyer/{idLoyer}", idLoyer))
                 .andExpect(status().isOk());
     }

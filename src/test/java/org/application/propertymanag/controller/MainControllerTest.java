@@ -17,9 +17,7 @@ public class MainControllerTest {
 
     @Autowired
     WebApplicationContext context;
-
     private MockMvc mockMvc;
-
     @BeforeEach
     public void setup() {
         mockMvc = MockMvcBuilders.webAppContextSetup(context)

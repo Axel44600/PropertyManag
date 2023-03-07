@@ -1,7 +1,6 @@
 package org.application.propertymanag.controller;
 
 import org.application.propertymanag.service.AppartService;
-import org.application.propertymanag.service.GarantieService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,15 +20,9 @@ public class GarantieControllerTest {
 
     @Autowired
     WebApplicationContext context;
-
     @Autowired
     AppartService appartService;
-
-    @Autowired
-    GarantieService garantieService;
-
     private MockMvc mockMvc;
-
     @BeforeEach
     public void setup() {
         mockMvc = MockMvcBuilders.webAppContextSetup(context)

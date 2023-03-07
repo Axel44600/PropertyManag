@@ -21,12 +21,9 @@ public class AppartControllerTest {
 
     @Autowired
     WebApplicationContext context;
-
     @Autowired
     AppartService appartService;
-
     private MockMvc mockMvc;
-
     @BeforeEach
     public void setup() {
         mockMvc = MockMvcBuilders.webAppContextSetup(context)

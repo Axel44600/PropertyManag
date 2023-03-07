@@ -21,12 +21,9 @@ public class LocataireControllerTest {
 
     @Autowired
     WebApplicationContext context;
-
     @Autowired
     LocataireService locataireService;
-
     private MockMvc mockMvc;
-
     @BeforeEach
     public void setup() {
         mockMvc = MockMvcBuilders.webAppContextSetup(context)

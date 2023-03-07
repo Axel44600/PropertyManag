@@ -1,7 +1,6 @@
 package org.application.propertymanag.controller;
 
-import org.application.propertymanag.service.AppartService;
-import org.application.propertymanag.service.EtatService;
+import org.application.propertymanag.service.impl.AppartServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,15 +21,9 @@ public class EtatControllerTest {
 
     @Autowired
     WebApplicationContext context;
-
     @Autowired
-    AppartService appartService;
-
-    @Autowired
-    EtatService etatService;
-
+    AppartServiceImpl appartService;
     private MockMvc mockMvc;
-
     @BeforeEach
     public void setup() {
         mockMvc = MockMvcBuilders.webAppContextSetup(context)
@@ -47,7 +40,7 @@ public class EtatControllerTest {
 
     @Test
     public void getEditEtatTest() throws Exception {
-        Integer idEtat = etatService.getListOfEtats().get(0).getIdEtat();
+        Integer idEtat = appartService.getListOfEtats().get(0).getIdEtat();
         this.mockMvc.perform(get("/app/appart/etat/editEtat/{idEtat}", idEtat))
                 .andExpect(status().isOk());
     }

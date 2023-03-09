@@ -6,7 +6,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-
 import java.io.IOException;
 
 @Controller
@@ -30,4 +29,5 @@ public class MainController implements PathConfig {
             model.addAttribute("appName", APP_NAME);
             return "/app/header";
     }
+
 }

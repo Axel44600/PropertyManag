@@ -42,11 +42,14 @@ public class LoyerController implements PathConfig {
     public String getHome(@PathVariable(value = "idAppart") Integer idAppart, Model model) {
         List<Loyer> listOfLoyers = appartService.getListOfLoyers().stream().filter(
                 loyer -> loyer.getIdAppart().getIdAppart().equals(idAppart)).toList();
+        List<Loyer> listOfLoyersPayed = appartService.getListOfLoyers().stream().filter(
+                loyer -> loyer.getIdAppart().getIdAppart().equals(idAppart) && loyer.getStatut().equals(true)).toList();
         Appartement a = appartService.getAppartById(idAppart);
 
         model.addAttribute("appName", APP_NAME);
         model.addAttribute("appart", a);
         model.addAttribute("listOfLoyers", listOfLoyers);
+        model.addAttribute("listOfLoyersPayed", listOfLoyersPayed);
         return "/app/appart/loyer/home";
     }
 
@@ -131,4 +134,20 @@ public class LoyerController implements PathConfig {
         }
     }
 
+    @PostMapping(value = "/createQuittance", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    @Secured({"ADMIN", "EMPLOYE"})
+    public String findLoyer(@RequestParam(name = "idAppart") Integer idAppart,
+                            @RequestParam(name = "dateD") LocalDate dateD,
+                            @RequestParam(name = "dateF") LocalDate dateF) {
+
+        if(idAppart != null && dateD != null && dateF != null) {
+            return validator.createQuittance(appartService, locataireService, mainService, idAppart, dateD, dateF);
+        } else {
+            return "{\"error\": \"yes\"}";
+        }
+
+    }
+
 }
+

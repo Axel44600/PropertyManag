@@ -5,7 +5,6 @@ import org.application.propertymanag.repository.*;
 import org.application.propertymanag.service.AppartService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDate;
 import java.util.List;
 
@@ -102,7 +101,6 @@ public class AppartServiceImpl implements AppartService {
     public void deleteLoyer(Loyer l) {
         loyerRepository.delete(l);
     }
-
 
     // DEPOT DE GARANTIE
     @Override

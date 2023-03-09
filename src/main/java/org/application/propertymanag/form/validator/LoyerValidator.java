@@ -3,12 +3,15 @@ package org.application.propertymanag.form.validator;
 import org.application.propertymanag.entity.Appartement;
 import org.application.propertymanag.entity.Locataire;
 import org.application.propertymanag.entity.Loyer;
+import org.application.propertymanag.file.QuittancePDF;
 import org.application.propertymanag.form.appart.loyer.LoyerForm;
 import org.application.propertymanag.service.impl.AppartServiceImpl;
 import org.application.propertymanag.service.impl.LocataireServiceImpl;
 import org.application.propertymanag.service.impl.MainServiceImpl;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -24,7 +27,7 @@ public class LoyerValidator {
         String origine = form.getOrigine();
         String result;
 
-            Appartement a = appartService.getAppartById(idAppart);
+        Appartement a = appartService.getAppartById(idAppart);
             boolean alReadyExist = appartService.getListOfLoyers().stream().anyMatch(loyer -> loyer.getIdAppart().getIdAppart().equals(a.getIdAppart()) &&
                             date.getYear() == loyer.getDate().getYear() &&
                             date.getMonthValue() == loyer.getDate().getMonthValue());
@@ -54,6 +57,7 @@ public class LoyerValidator {
                     // "Le profil du locataire a été créer avec succès."
                     result = "{\"success\": \"yes\"}";
                 } else {
+                    System.out.println(a.getIdAppart());
                     // "Un loyer a déjà été enregistrer pour ce mois."
                     result = "{\"error\": \"one\"}";
                 }
@@ -61,7 +65,6 @@ public class LoyerValidator {
                 // "La date du loyer ne peut pas être plus ancienne que l'appartement."
                 result = "{\"error\": \"two\"}";
             }
-
         return result;
     }
 
@@ -113,5 +116,31 @@ public class LoyerValidator {
         return result;
     }
 
+    // Créer une quittance de loyer
+    public String createQuittance(AppartServiceImpl appartService, LocataireServiceImpl locataireService, MainServiceImpl mainService, Integer idAppart, LocalDate dateD, LocalDate dateF) {
+        Appartement appart = appartService.getAppartById(idAppart);
+        Locataire loc = locataireService.getLocataireById(appart.getIdLoc().getIdLoc());
+        List<Loyer> listOfLoyers = appartService.getListOfLoyers().stream().filter(loyer -> loyer.getIdAppart().getIdAppart().equals(idAppart)).toList();
+        List<Loyer> selectLoyers = new ArrayList<>();
+        if(appartService.getAppartById(idAppart).getIdLoc().getSolde() >= 0) {
+            for(Loyer l : listOfLoyers) {
+                if((l.getDate().isEqual(dateD) || l.getDate().isAfter(dateD)) && (l.getDate().equals(dateF) || l.getDate().isBefore(dateF))) {
+                    selectLoyers.add(l);
+                }
+            }
+        }
 
+        String titleFile = loc.getNom().toUpperCase()+"_"+loc.getPrenom()+"_Quittance_de_loyer_APPART_N°"+idAppart+"_"+mainService.getRandomStr(8)+".pdf";
+
+        List<LocalDate> listOfDates = new ArrayList<>();
+        for(Loyer l : selectLoyers) {
+            listOfDates.add(l.getDate());
+        }
+        LocalDate dateDebut = Collections.min(listOfDates);
+        LocalDate dateFin = Collections.max(listOfDates);
+
+        QuittancePDF pdf = new QuittancePDF(titleFile);
+        pdf.createQuittance(appart, loc, dateDebut, dateFin);
+        return "{\"success\": \"yes\"}";
+    }
 }

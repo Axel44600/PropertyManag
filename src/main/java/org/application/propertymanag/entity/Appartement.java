@@ -18,7 +18,7 @@ public class Appartement {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="appart_seq")
     @Column(name="id_appart", updatable = false)
     private Integer idAppart;
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "id_loc", nullable = true)
     private Locataire idLoc;
     private String adresse;
@@ -66,24 +66,12 @@ public class Appartement {
         return adresseComp;
     }
 
-    public void setAdresseComp(String adresseComp) {
-        this.adresseComp = adresseComp;
-    }
-
     public String getVille() {
         return ville;
     }
 
-    public void setVille(String ville) {
-        this.ville = ville;
-    }
-
     public Integer getCodePostal() {
         return codePostal;
-    }
-
-    public void setCodePostal(Integer codePostal) {
-        this.codePostal = codePostal;
     }
 
     public Integer getMontantLoyer() {
@@ -112,14 +100,6 @@ public class Appartement {
 
     public LocalDate getDateCreation() {
         return dateCreation;
-    }
-
-    public void setDateCreation(LocalDate dateCreation) {
-        this.dateCreation = dateCreation;
-    }
-
-    public Integer getMontantFraisAgence() {
-        return montantFraisAgence;
     }
 
     public void setMontantFraisAgence(Integer montantFraisAgence) {

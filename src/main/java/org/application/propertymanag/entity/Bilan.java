@@ -19,10 +19,10 @@ public class Bilan {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="bilan_seq")
     @Column(name="id_bilan", updatable = false)
     private Integer idBilan;
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "id_appart", nullable = false)
     private Appartement idAppart;
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "id_loc", nullable = false)
     private Locataire idLoc;
     @Column(name="date_debut")
@@ -36,10 +36,6 @@ public class Bilan {
 
     public Integer getIdBilan() {
         return idBilan;
-    }
-
-    public void setIdBilan(Integer idBilan) {
-        this.idBilan = idBilan;
     }
 
     public Appartement getIdAppart() {
@@ -62,31 +58,15 @@ public class Bilan {
         return dateDebut;
     }
 
-    public void setDateDebut(LocalDate dateDebut) {
-        this.dateDebut = dateDebut;
-    }
-
     public LocalDate getDateFin() {
         return dateFin;
-    }
-
-    public void setDateFin(LocalDate dateFin) {
-        this.dateFin = dateFin;
     }
 
     public Integer getNbLoyers() {
         return nbLoyers;
     }
 
-    public void setNbLoyers(Integer nbLoyers) {
-        this.nbLoyers = nbLoyers;
-    }
-
     public Long getMontantTotal() {
         return montantTotal;
-    }
-
-    public void setMontantTotal(Long montantTotal) {
-        this.montantTotal = montantTotal;
     }
 }

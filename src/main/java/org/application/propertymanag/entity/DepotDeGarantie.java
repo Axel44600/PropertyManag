@@ -17,7 +17,7 @@ public class DepotDeGarantie {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="depot_seq")
     @Column(name="id_depot", updatable = false)
     private Integer idDepot;
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "id_appart", nullable = false)
     private Appartement idAppart;
     private Integer montant;
@@ -26,10 +26,6 @@ public class DepotDeGarantie {
 
     public Integer getIdDepot() {
         return idDepot;
-    }
-
-    public void setIdDepot(Integer idDepot) {
-        this.idDepot = idDepot;
     }
 
     public Appartement getIdAppart() {

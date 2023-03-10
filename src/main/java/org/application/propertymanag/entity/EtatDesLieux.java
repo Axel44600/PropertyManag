@@ -19,7 +19,7 @@ public class EtatDesLieux {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="etat_seq")
     @Column(name="id_etat", updatable = false)
     private Integer idEtat;
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "id_appart", nullable = false)
     private Appartement idAppart;
     private String type;
@@ -29,10 +29,6 @@ public class EtatDesLieux {
 
     public Integer getIdEtat() {
         return idEtat;
-    }
-
-    public void setIdEtat(Integer idEtat) {
-        this.idEtat = idEtat;
     }
 
     public Appartement getIdAppart() {

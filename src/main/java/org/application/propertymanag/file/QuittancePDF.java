@@ -3,7 +3,6 @@ package org.application.propertymanag.file;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
 import org.application.propertymanag.entity.Appartement;
-import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
 import org.application.propertymanag.entity.Locataire;
@@ -13,7 +12,6 @@ import static org.application.propertymanag.configuration.PathConfig.APP_NAME;
 
 public class QuittancePDF {
 
-    private final String titleFile;
     private static final DateTimeFormatter formatters = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private static final LocalDate date = LocalDate.now();
     private static final Font catFont = new Font(Font.FontFamily.HELVETICA, 20, Font.BOLD);
@@ -21,15 +19,8 @@ public class QuittancePDF {
     private static final Font smallBold = new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD);
     private static final Font small = new Font(Font.FontFamily.HELVETICA, 10, Font.NORMAL);
 
-    public QuittancePDF(String titleFile) {
-        this.titleFile = titleFile;
-    }
-
-    public void createQuittance(Appartement appart, Locataire locataire, LocalDate dateDebut, LocalDate dateFin) {
+    public void createQuittance(Appartement appart, Locataire locataire, LocalDate dateDebut, LocalDate dateFin, String url) {
             try {
-                String absolutePath = new File("pom.xml").getAbsolutePath();
-                String filePath = absolutePath.substring(0,absolutePath.lastIndexOf(File.separator));
-                String url = filePath+"\\src\\main\\resources\\templates\\app\\docs\\quittance\\"+titleFile;
                 Document document = new Document();
                 PdfWriter.getInstance(document, new FileOutputStream(url));
                 document.open();

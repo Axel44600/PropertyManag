@@ -14,13 +14,13 @@ public class ResetFiles {
 
     private final String absolutePath = new File("pom.xml").getAbsolutePath();
     private final String filePath = absolutePath.substring(0,absolutePath.lastIndexOf(File.separator));
-    private final String url = filePath+"\\src\\main\\resources\\templates\\app\\docs\\quittance";
-    private static final String packageName = "quittance";
+    private final String url = filePath+"\\pdf\\quittance";
+    private static final String dirName = "quittance";
 
     public static void delete(File f) throws IOException {
         if(f.isDirectory()) {
             if(Objects.requireNonNull(f.list()).length == 0){
-                System.out.println("Le dossier "+packageName+" a été supprimé : "+ f.getAbsolutePath());
+                System.out.println("Le dossier "+dirName+" a été supprimé : "+ f.getAbsolutePath());
             } else {
                 String[] files = f.list();
                 assert files != null;
@@ -30,12 +30,12 @@ public class ResetFiles {
                 }
                 if(Objects.requireNonNull(f.list()).length == 0){
                     f.delete();
-                    System.out.println("Le dossier "+packageName+" a été supprimé : "+ f.getAbsolutePath());
+                    System.out.println("Le dossier "+dirName+" a été supprimé : "+ f.getAbsolutePath());
                 }
             }
         } else {
             f.delete();
-            System.out.println("Les fichiers du dossier "+packageName+" ont été supprimés : " + f.getAbsolutePath());
+            System.out.println("Les fichiers du dossier "+dirName+" ont été supprimés : " + f.getAbsolutePath());
         }
     }
 
@@ -48,10 +48,10 @@ public class ResetFiles {
         File dossier = new File(url);
         boolean res = dossier.mkdir();
             if(res) {
-                System.out.println("Le dossier "+packageName+" a été créé.");
+                System.out.println("Le dossier "+dirName+" a été créé.");
             }
             else {
-                System.out.println("Le dossier "+packageName+" existe déjà.");
+                System.out.println("Le dossier "+dirName+" existe déjà.");
             }
     }
 

@@ -39,11 +39,6 @@ public class AppartServiceImpl implements AppartService {
     }
 
     @Override
-    public Appartement getAppartByIdLocataire(Integer idLoc) {
-        return appartRepository.findByIdLoc(idLoc);
-    }
-
-    @Override
     public List<Appartement> getListOfApparts() {
         return appartRepository.findAll();
     }
@@ -51,6 +46,20 @@ public class AppartServiceImpl implements AppartService {
     @Override
     public void createAppart(Appartement a) {
         appartRepository.save(a);
+    }
+
+    @Override
+    public void deleteAppart(Appartement a) {
+        List<EtatDesLieux> listOfEtats = etatRepository.findAll().stream().filter(etatDesLieux -> etatDesLieux.getIdAppart().getIdAppart().equals(a.getIdAppart())).toList();
+            etatRepository.deleteAll(listOfEtats);
+        List<Loyer> listOfLoyers = loyerRepository.findAll().stream().filter(loyer -> loyer.getIdAppart().getIdAppart().equals(a.getIdAppart())).toList();
+            loyerRepository.deleteAll(listOfLoyers);
+        List<DepotDeGarantie> listOfDepots = garantieRepository.findAll().stream().filter(garantie -> garantie.getIdAppart().getIdAppart().equals(a.getIdAppart())).toList();
+            garantieRepository.deleteAll(listOfDepots);
+        List<Bilan> listOfBilans = bilanRepository.findAll().stream().filter(bilan -> bilan.getIdAppart().getIdAppart().equals(a.getIdAppart())).toList();
+            bilanRepository.deleteAll(listOfBilans);
+
+        appartRepository.delete(a);
     }
 
 
@@ -120,10 +129,6 @@ public class AppartServiceImpl implements AppartService {
 
 
     // BILAN DES COMPTES DES LOYERS
-    @Override
-    public Bilan getBilanById(Integer idBilan) {
-        return bilanRepository.findById(idBilan).orElseThrow();
-    }
 
     @Override
     public List<Bilan> getListOfBilans() {

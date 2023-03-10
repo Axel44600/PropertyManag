@@ -12,11 +12,11 @@ public interface AppartService {
 
     Appartement getAppartByAdresse(String adresse);
 
-    Appartement getAppartByIdLocataire(Integer idLoc);
-
     List<Appartement> getListOfApparts();
 
     void createAppart(Appartement a);
+
+    void deleteAppart(Appartement a);
 
 
     // ETAT DES LIEUX
@@ -50,11 +50,9 @@ public interface AppartService {
 
 
     // BILAN DES COMPTES DES LOYERS
-    Bilan getBilanById(Integer idBilan);
 
     List<Bilan> getListOfBilans();
 
     void createBilan(Bilan b);
-
 
 }

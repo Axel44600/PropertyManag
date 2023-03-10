@@ -70,7 +70,7 @@ public class LoyerController implements PathConfig {
     @PostMapping(value = "/researchLoyer", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @Secured({"ADMIN", "EMPLOYE"})
-    public String findLoyer(@RequestParam(name = "dateL") LocalDate date, @RequestParam(name = "idAppart") Integer idAppart) {
+    public String createQuittance(@RequestParam(name = "dateL") LocalDate date, @RequestParam(name = "idAppart") Integer idAppart) {
         if(date != null){
             Loyer l = appartService.getLoyerByDate(date);
             if(l != null && l.getIdAppart().getIdAppart().equals(idAppart)) {
@@ -137,9 +137,9 @@ public class LoyerController implements PathConfig {
     @PostMapping(value = "/createQuittance", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @Secured({"ADMIN", "EMPLOYE"})
-    public String findLoyer(@RequestParam(name = "idAppart") Integer idAppart,
-                            @RequestParam(name = "dateD") LocalDate dateD,
-                            @RequestParam(name = "dateF") LocalDate dateF) {
+    public String createQuittance(@RequestParam(name = "idAppart") Integer idAppart,
+                                  @RequestParam(name = "dateD") LocalDate dateD,
+                                  @RequestParam(name = "dateF") LocalDate dateF) {
 
         if(idAppart != null && dateD != null && dateF != null) {
             return validator.createQuittance(appartService, locataireService, mainService, idAppart, dateD, dateF);

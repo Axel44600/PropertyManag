@@ -111,4 +111,13 @@ public class AppartController implements PathConfig {
         }
     }
 
+    @DeleteMapping(value = "/deleteAppart")
+    public void deleteUser(@RequestParam("idAppart") Integer idAppart, HttpServletResponse response) throws IOException {
+        if(idAppart != null) {
+            Appartement a = appartService.getAppartById(idAppart);
+            appartService.deleteAppart(a);
+            response.sendRedirect("/app/appart");
+        }
+    }
+
 }

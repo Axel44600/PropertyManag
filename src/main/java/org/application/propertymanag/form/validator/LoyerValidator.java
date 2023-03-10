@@ -1,5 +1,6 @@
 package org.application.propertymanag.form.validator;
 
+import org.application.propertymanag.configuration.PathConfig;
 import org.application.propertymanag.entity.Appartement;
 import org.application.propertymanag.entity.Locataire;
 import org.application.propertymanag.entity.Loyer;
@@ -8,7 +9,7 @@ import org.application.propertymanag.form.appart.loyer.LoyerForm;
 import org.application.propertymanag.service.impl.AppartServiceImpl;
 import org.application.propertymanag.service.impl.LocataireServiceImpl;
 import org.application.propertymanag.service.impl.MainServiceImpl;
-
+import java.io.File;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -130,7 +131,11 @@ public class LoyerValidator {
             }
         }
 
+        String absolutePath = new File("pom.xml").getAbsolutePath();
+        String filePath = absolutePath.substring(0,absolutePath.lastIndexOf(File.separator));
         String titleFile = loc.getNom().toUpperCase()+"_"+loc.getPrenom()+"_Quittance_de_loyer_APPART_N°"+idAppart+"_"+mainService.getRandomStr(8)+".pdf";
+        String url = filePath+"\\pdf\\quittance\\"+titleFile;
+        String urlWeb = PathConfig.PATH+"/pdf/quittance/"+titleFile;
 
         List<LocalDate> listOfDates = new ArrayList<>();
         for(Loyer l : selectLoyers) {
@@ -139,8 +144,9 @@ public class LoyerValidator {
         LocalDate dateDebut = Collections.min(listOfDates);
         LocalDate dateFin = Collections.max(listOfDates);
 
-        QuittancePDF pdf = new QuittancePDF(titleFile);
-        pdf.createQuittance(appart, loc, dateDebut, dateFin);
-        return "{\"success\": \"yes\"}";
+        QuittancePDF pdf = new QuittancePDF();
+        pdf.createQuittance(appart, loc, dateDebut, dateFin, url);
+        return "{\"success\": \"yes\"," +
+                "\"urlWeb\": \"" + urlWeb + "\"}";
     }
 }

@@ -1,0 +1,10 @@
+
+<tr id="data" th:each="l : ${listOfLocataires}">
+  <th scope="row" th:text="${l.idLoc}"></th>
+  <td style="text-transform: uppercase" th:text="${l.nom}"></td>
+  <td th:text="${l.prenom}"></td>
+  <td th:text="${l.email}"></td>
+  <td><a th:href="@{./editLocataire/{lName}(lName=${l.nom})}"><button type="button" style="border-color: #86a6df; background-color: #86a6df;"class="btn btn-primary">MODIFIER</button></a></td>
+  <td><a th:href="@{./bilan/{lNom}(lNom=${l.nom})}"><button type="button" style="border-color: #86a6df; background-color: #86a6df;"class="btn btn-primary">BILAN</button></a></td>
+</tr>
+

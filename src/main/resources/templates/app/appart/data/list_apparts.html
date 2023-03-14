@@ -1,0 +1,33 @@
+<tr th:each="a : ${listOfApparts}">
+  <th scope="row" th:text="${'N°'+a.idAppart}"></th>
+  <td th:text="${a.adresse+' - '+a.codePostal+', '+a.ville+' ('+a.adresseComp+')'}"></td>
+  <td>
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" th:data-bs-target="'#actions'+${a.idAppart}">
+      ACTIONS
+    </button>
+    <div class="modal fade" th:id="'actions'+${a.idAppart}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="actionLabel">Actions disponibles pour l'appartement N°<span th:text="${a.idAppart}" /></h1>
+            <button type="button" id="actionClose" class="btn-close" data-bs-dismiss="modal" aria-label="Annuler"></button>
+          </div>
+          <div class="modal-body" style="display: flex; flex-wrap: wrap;">
+            <a style="margin-top: 8px;" th:href="@{./editAppart/{aId}(aId=${a.idAppart})}"><button style="margin: 2px" type="button" class="btn btn-primary">MODIFIER</button></a>
+
+            <form th:method="delete" action="./deleteAppart">
+              <input type="number" th:value="${a.idAppart}" style="display: none;" name="idAppart" readonly/>
+              <button type="submit" style="margin-top: 10px; margin-right: 2px;" class="btn btn-primary">SUPPRIMER</button>
+            </form>
+            <a style="margin-top: 8px;" th:href="@{./appart/loyer/{aId}(aId=${a.idAppart})}"><button type="button" style="margin: 2px;" class="btn btn-primary">VOIR LOYERS</button></a>
+            <a style="margin-top: 8px;" th:href="@{./appart/etat/{aId}(aId=${a.idAppart})}"><button style="margin: 2px;" type="button" class="btn btn-primary">VOIR ÉTAT DES LIEUX</button></a>
+            <a style="margin-top: 8px;" th:href="@{./appart/depotGarantie/{aId}(aId=${a.idAppart})}"><button style="margin: 2px;"type="button" class="btn btn-primary">VOIR DÉPÔT DE GARANTIE</button></a>
+            <div th:if="${a.idLoc != null}">
+              <a th:href="@{./editLocataire/{aIdLoc}(aIdLoc=${a.idLoc.nom})}"><button style="margin: 8px 2px 2px 2px;" type="button" class="btn btn-primary">VOIR LOCATAIRE ACTUEL</button></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </td>
+</tr>

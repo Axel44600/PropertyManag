@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="https://www.thymeleaf.org/">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${appName} + ' - Administration'"></title>
+    <link rel="shortcut icon" type="image/x-icon" th:href="@{/favicon/favicon.ico}"/>
+    <link href="https://fonts.googleapis.com/css?family=Muli:300,300i,400,400i,600,600i,700,700i%7CComfortaa:300,400,700" rel="stylesheet">
+    <link href="https://maxcdn.icons8.com/fonts/line-awesome/1.1/css/line-awesome.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" th:href="@{/theme-assets/css/app/main.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/theme-assets/css/vendors.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/theme-assets/css/app-lite.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/theme-assets/css/core/menu/menu-types/vertical-menu.css}">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+<body class="vertical-layout vertical-menu 2-columns   menu-expanded fixed-navbar" data-open="click" data-menu="vertical-menu" data-color="bg-chartbg" data-col="2-columns">
+
+<div class="jumbotron jumbotron-fluid">
+    <div class="banniere">
+        <div class="container"></div>
+    </div>
+</div>
+<header id="header"></header>
+
+<div class="card" style="margin-left: 400px; margin-right: auto; width: 40%;">
+    <div class="card-header">
+        <h2>UTILISATEUR N°<span th:text="${user.id}" /></h2>
+    </div>
+
+    <div class="card-body">
+        <blockquote class="blockquote mb-0">
+
+            <a href="/app/admin/home"><button type="button" class="btn btn-primary">Liste des utilisateurs</button></a>
+
+            <div id="alert"></div>
+
+            </p>
+            <p>Modifier les informations - <b><span style="text-transform: uppercase" th:text="${user.nom}" /> <span th:text="${user.prenom}" /> </b></p>
+
+            <div class="container">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm">
+
+                            <form id="editUser" method="post" action="/app/admin/editUser">
+                                <div class="row">
+                                    <div class="col" style="display: none;">
+                                        <label for="nomU">Id :</label>
+                                        <input type="number" th:value="${user.id}" class="form-control" name="id" readonly />
+                                    </div>
+                                    <div class="col">
+                                        <label for="nomU">Nom :</label>
+                                        <input type="text" id="nomU" th:value="${user.nom}" class="form-control" name="lastName" required />
+                                    </div>
+
+                                    <div class="col">
+                                        <label for="prenomU">Prénom :</label>
+                                        <input type="text" id="prenomU" th:value="${user.prenom}" class="form-control" name="firstName" required />
+                                    </div>
+
+                                    <div class="col">
+                                        <label for="pseudonyme">Pseudonyme :</label>
+                                        <input type="text" id="pseudonyme" th:value="${user.pseudo}" class="form-control" readonly />
+                                    </div>
+                                </div>
+
+                                <div class="row" style="margin-top: 8px;">
+                                    <div class="col">
+                                        <label for="roleU">Poste :</label><br>
+                                        <select style="height: 40px; width: 100%;" name="role" id="roleU">
+                                            <div th:if="${user.role.name() == 'EMPLOYE'}">
+                                                <option th:value="${user.role.name()}">Employé</option>
+                                                <option value="ADMIN">Gérant</option>
+                                            </div>
+                                            <div th:unless="${user.role.name() == 'EMPLOYE'}">
+                                                <option th:value="${user.role.name()}">Gérant</option>
+                                                <option value="EMPLOYE">Employé</option>
+                                            </div>
+                                        </select>
+                                    </div>
+                                    <div class="col">
+                                        <label for="passwordU">Mot de passe :</label>
+                                        <input type="password" id="passwordU" class="form-control" value="*********" readonly />
+                                    </div>
+                                    <div class="col">
+                                        <label for="repassU">Confirmation :</label>
+                                        <input type="password" id="repassU" class="form-control" value="*********" readonly />
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col">
+                                        <label></label>
+                                        <button id="submit" style="width: 100%; margin-top: 7px; border-color: #86a6df; background-color: #86a6df;" class="btn btn-primary">VALIDER</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </blockquote>
+    </div>
+</div>
+
+<script type="text/javascript" th:src="@{/js/admin/editUser.js}"></script>
+</body>
+</html>

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="https://www.thymeleaf.org/">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${appName} + ' - État des lieux'"></title>
+    <link rel="shortcut icon" type="image/x-icon" th:href="@{/favicon/favicon.ico}"/>
+    <link href="https://fonts.googleapis.com/css?family=Muli:300,300i,400,400i,600,600i,700,700i%7CComfortaa:300,400,700" rel="stylesheet">
+    <link href="https://maxcdn.icons8.com/fonts/line-awesome/1.1/css/line-awesome.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" th:href="@{/theme-assets/css/app/main.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/theme-assets/css/vendors.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/theme-assets/css/app-lite.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/theme-assets/css/core/menu/menu-types/vertical-menu.css}">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+<body class="vertical-layout vertical-menu 2-columns   menu-expanded fixed-navbar" data-open="click" data-menu="vertical-menu" data-color="bg-chartbg" data-col="2-columns">
+
+<div class="jumbotron jumbotron-fluid">
+    <div class="banniere">
+        <div class="container"></div>
+    </div>
+</div>
+
+<header id="header"></header>
+
+<div class="card" style="margin-left: 400px; margin-right: auto; width: 70%;">
+    <div class="card-header">
+        <h2>APPARTEMENT N°<span th:text="${idAppart}" /> - ÉTAT DES LIEUX</h2>
+    </div>
+    <div class="card-body">
+        <blockquote class="blockquote mb-0">
+            <div id="error" style="margin-bottom: 6px;"></div>
+            <a href="/app/appart"><button type="button" class="btn btn-primary">Liste des appartements</button></a>
+            </p>
+
+            <p>Liste des état des lieux :</p>
+            <div class="container">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th scope="col">Date et heure</th>
+                        <th scope="col">Type</th>
+                        <th scope="col">Référence</th>
+                        <th scope="col"></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="e : ${listOfEtats}" th:if="${!e.ref.contains('close')}">
+                        <div th:if="${e.date != null}">
+                            <th scope="row" th:text="${(e.date.toString().substring(0,10)) + ' à ' + (e.date.toString().substring(11,16))}"></th>
+                        </div>
+                        <div th:unless="${e.date != null}">
+                            <th scope="row">Indéfinie</th>
+                        </div>
+                        <td th:text="${e.type}"></td>
+                        <td th:text="${e.ref}"></td>
+                        <td>
+                            <a th:href="@{./editEtat/{eId}(eId=${e.idEtat})}"><button type="button" style="border-color: #86a6df; background-color: #86a6df; width: 100%;" class="btn btn-primary">MODIFIER</button></a>
+                        </td>
+                    </tr>
+                    <tr th:each="e : ${listOfEtats}" th:unless="${!e.ref.contains('close')}" style="background-color: #eee; opacity: 0.7;">
+                        <div th:if="${e.date != null}">
+                            <th scope="row" th:text="${(e.date.toString().substring(0,10)) + ' à ' + (e.date.toString().substring(11,16))}"></th>
+                        </div>
+                        <div th:unless="${e.date != null}">
+                            <th scope="row">Indéfinie</th>
+                        </div>
+                        <td th:text="${e.type}"></td>
+                        <td th:text="${e.ref}"></td>
+                        <td>
+                            <a th:href="@{./editEtat/{eId}(eId=${e.idEtat})}"><button type="button" style="border-color: #86a6df; background-color: #86a6df; width: 100%;" class="btn btn-primary">VOIR</button></a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </blockquote>
+    </div>
+</div>
+
+<script type="text/javascript" th:src="@{/js/appart/home.js}"></script>
+
+</body>
+</html>

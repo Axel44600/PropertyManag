@@ -1,0 +1,27 @@
+<tr th:each="l: ${listOfLoyers}" th:if="${!l.statut}" style="background-color: #fa626b; color: #fff;">
+    <th scope="row" th:text="${l.date}"></th>
+    <th th:text="${l.ref}"></th>
+    <td th:text="${l.montant} + '€'"></td>
+    <td>Impayé</td>
+    <td>
+        <form th:method="delete" action="./deleteLoyer">
+            <input type="number" th:value="${l.idLoyer}" style="display: none;" name="idLoyer" readonly />
+            <button style="border-color: #86a6df; background-color: #86a6df; width: 100%;" type="submit" class="btn btn-primary">SUPPRIMER</button>
+        </form>
+        <a th:href="@{./editLoyer/{lId}(lId=${l.idLoyer})}">
+            <button type="button" style="margin-top: 6px; width: 100%; border-color: #86a6df; background-color: #86a6df;" class="btn btn-primary">MODIFIER</button>
+        </a>
+    </td>
+</tr>
+<tr th:each="l: ${listOfLoyers}" th:unless="${!l.statut}" style="background-color: #4caf50; color: #fff;">
+    <th scope="row" th:text="${l.date}"></th>
+    <th th:text="${l.ref}"></th>
+    <td th:text="${l.montant} + '€'"></td>
+    <td>Payé</td>
+    <td>
+        <form th:method="delete" action="./deleteLoyer">
+            <input type="number" th:value="${l.idLoyer}" style="display: none;" name="idLoyer" readonly />
+            <button type="submit" style="border-color: #86a6df; background-color: #86a6df;" class="btn btn-primary">SUPPRIMER</button>
+        </form>
+    </td>
+</tr>

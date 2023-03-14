@@ -1,0 +1,30 @@
+<div class="main-menu menu-fixed menu-light menu-accordion    menu-shadow " data-scroll-to-active="true">
+  <div class="navbar-header">
+    <ul class="nav navbar-nav flex-row">
+      <li class="nav-item mr-auto"><a class="navbar-brand"><img class="brand-logo"/>
+        <h4 class="brand-text" th:text="${appName}"></h4></a></li>
+      <li class="nav-item d-md-none"><a class="nav-link close-navbar"><i class="ft-x"></i></a></li>
+    </ul>
+  </div>
+  <div class="main-menu-content">
+    <ul class="navigation navigation-main" id="main-menu-navigation" data-menu="menu-navigation">
+      <li class=" nav-item">
+               <span style="text-align: center">
+                    <p>Poste :
+                      <span th:if="${role.equals('ADMIN')}"><b>Gérant</b></span>
+                       <span th:unless="${role.equals('ADMIN')}"><b>Employé</b></span>
+                    </p>
+               </span>
+      </li>
+      <li id="head-loc" class=" nav-item"><a href="/app/home"><i class="ft-user"></i><span class="menu-title" data-i18n="">Locataire</span></a>
+      </li>
+      <li id="head-appart" class=" nav-item"><a href="/app/appart"><i class="ft-home"></i><span class="menu-title" data-i18n="">Appartement</span></a>
+      </li>
+      <li id="head-admin" class=" nav-item" th:if="${role.equals('ADMIN')}">
+        <a href="/app/admin/home"><i class="ft-settings"></i><span class="menu-title" data-i18n="">Administration</span></a>
+      </li>
+    </ul>
+  </div>
+  <a class="btn btn-danger btn-block btn-glow btn-upgrade-pro mx-1" href="/logout">Déconnexion</a>
+  <div class="navigation-background"></div>
+</div>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="https://www.thymeleaf.org/">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${appName} + ' - Loyer'"></title>
+    <link rel="shortcut icon" type="image/x-icon" th:href="@{/favicon/favicon.ico}"/>
+    <link href="https://fonts.googleapis.com/css?family=Muli:300,300i,400,400i,600,600i,700,700i%7CComfortaa:300,400,700" rel="stylesheet">
+    <link href="https://maxcdn.icons8.com/fonts/line-awesome/1.1/css/line-awesome.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" th:href="@{/theme-assets/css/app/main.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/theme-assets/css/vendors.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/theme-assets/css/app-lite.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/theme-assets/css/core/menu/menu-types/vertical-menu.css}">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+<body class="vertical-layout vertical-menu 2-columns   menu-expanded fixed-navbar" data-open="click" data-menu="vertical-menu" data-color="bg-chartbg" data-col="2-columns">
+
+<div class="jumbotron jumbotron-fluid">
+    <div class="banniere">
+        <div class="container"></div>
+    </div>
+</div>
+<header id="header"></header>
+
+<div class="card" style="margin-left: 400px; margin-right: auto; width: 40%;">
+    <div class="card-header">
+        <h2>APPARTEMENT N°<span th:text="${appart.idAppart}" /> - LOYER N°<span th:text="${loyer.idLoyer}" /></h2>
+    </div>
+
+    <div class="card-body">
+        <blockquote class="blockquote mb-0">
+
+            <a th:href="@{/app/appart/loyer/{aId}(aId=${appart.idAppart})}"><button type="button" class="btn btn-primary">Liste des loyers</button></a>
+
+            <div id="alert"></div>
+
+            </p>
+            <p>Modifier les informations du loyer</p>
+
+            <div class="container">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm">
+                            <form id="editLoyer" method="post" action="/app/appart/loyer/editLoyer">
+                                <div class="row">
+                                    <div class="col" style="display: none;">
+                                        <label>Id :</label>
+                                        <input type="text" th:value="${loyer.idLoyer}" class="form-control" name="idLoyer" readonly />
+                                    </div>
+                                    <div class="col">
+                                        <label for="refL">Référence :</label>
+                                        <input type="text" id="refL" th:value="${loyer.ref}" class="form-control" name="ref" readonly />
+                                    </div>
+                                    <div class="col">
+                                        <label for="montantL">Montant (€) :</label>
+                                        <input type="number" id="montantL" th:value="${loyer.montant}" class="form-control" name="montant" readonly />
+                                    </div>
+                                    <div class="col">
+                                        <label for="statutL">Statut:</label><br>
+                                        <select style="height: 40px; width: 100%;" name="statut" id="statutL">
+                                            <div th:if="${loyer.statut}">
+                                                <option th:value="${loyer.statut}" th:text="Payé"></option>
+                                                <option value="false" th:text="Impayé"></option>
+                                            </div>
+                                            <div th:unless="${loyer.statut}">
+                                                <option th:value="${loyer.statut}" th:text="Impayé"></option>
+                                                <option value="true" th:text="Payé"></option>
+                                            </div>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="row" style="margin-top: 8px;">
+                                    <div class="col">
+                                        <label for="dateL">Date :</label>
+                                        <input type="date" id="dateL" th:value="${loyer.date}" class="form-control" name="date" required />
+                                    </div>
+                                    <div class="col">
+                                        <label for="origineL">Origine du paiement :</label>
+                                        <select style="height: 40px; width: 100%;" name="origine" id="origineL">
+                                            <div th:if="${loyer.originePaiement.equals('loc')}">
+                                                <option th:value="${loyer.originePaiement}">Locataire</option>
+                                                <option value="alloc">Caisse d'allocation familiale</option>
+                                            </div>
+                                            <div th:unless="${loyer.originePaiement.equals('loc')}">
+                                                <option th:value="${loyer.originePaiement}">Caisse d'allocation familiale</option>
+                                                <option value="loc">Locataire</option>
+                                            </div>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col">
+                                        <label></label>
+                                        <button id="submit" style="width: 100%; margin-top: 7px; border-color: #86a6df; background-color: #86a6df;" class="btn btn-primary">VALIDER</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </blockquote>
+    </div>
+</div>
+
+<script type="text/javascript" th:src="@{/js/appart/loyer/editLoyer.js}"></script>
+
+</body>
+</html>

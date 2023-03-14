@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="https://www.thymeleaf.org/">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${appName} + ' - Locataire'"></title>
+    <link rel="shortcut icon" type="image/x-icon" th:href="@{/favicon/favicon.ico}"/>
+    <link href="https://fonts.googleapis.com/css?family=Muli:300,300i,400,400i,600,600i,700,700i%7CComfortaa:300,400,700" rel="stylesheet">
+    <link href="https://maxcdn.icons8.com/fonts/line-awesome/1.1/css/line-awesome.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" th:href="@{/theme-assets/css/app/main.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/theme-assets/css/vendors.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/theme-assets/css/app-lite.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/theme-assets/css/core/menu/menu-types/vertical-menu.css}">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+<body class="vertical-layout vertical-menu 2-columns   menu-expanded fixed-navbar" data-open="click" data-menu="vertical-menu" data-color="bg-chartbg" data-col="2-columns">
+
+<div class="jumbotron jumbotron-fluid">
+    <div class="banniere">
+        <div class="container"></div>
+    </div>
+</div>
+<header id="header"></header>
+
+<div class="card" style="margin-left: 400px; margin-right: auto; width: 40%;">
+    <div class="card-header">
+        <h2>LOCATAIRE N°<span th:text="${locataire.idLoc}" /></h2>
+    </div>
+
+    <div class="card-body">
+        <blockquote class="blockquote mb-0">
+                <a href="/app/home"><button type="button" class="btn btn-primary">Liste des locataires</button></a>
+
+            <div id="alert"></div>
+
+            </p>
+            <p>Modifier les coordonnées - <b><span style="text-transform: uppercase;" th:text="${locataire.nom}" /> <span th:text="${locataire.prenom}" /> </b></p>
+
+            <div class="container">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm">
+
+                            <form id="editLoc" method="post" action="/app/editLocataire">
+                                <div class="row">
+                                    <div class="col">
+                                        <label for="nom">Nom du locataire :</label>
+                                        <input type="text" id="nom" th:value="${locataire.nom}" class="form-control" minlength="3" name="lastName" readonly>
+                                    </div>
+                                    <div class="col">
+                                        <label for="prenom">Prénom du locataire :</label>
+                                        <input type="text" id="prenom" th:value="${locataire.prenom}" class="form-control" minlength="3" name="firstName" required>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col">
+                                        <label for="mail">Email :</label>
+                                        <input type="email" id="mail" th:value="${locataire.email}" class="form-control" name="email"required>
+                                    </div>
+                                    <div class="col">
+                                        <label for="tel">N° de téléphone :</label>
+                                        <input type="tel" id="tel" th:value="${locataire.tel}" class="form-control" minlength="10" maxlength="10" name="tel" required>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col">
+                                        <label for="solde">Solde (€) :</label>
+                                        <input type="number" id="solde" th:value="${locataire.solde}" class="form-control" name="solde" required>
+                                    </div>
+                                    <div class="col">
+                                        <label></label>
+                                        <button id="submit" style="width: 100%; margin-top: 7px; border-color: #86a6df; background-color: #86a6df;" class="btn btn-primary">VALIDER</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+        </blockquote>
+    </div>
+</div>
+
+<script type="text/javascript" th:src="@{/js/loc/editLoc.js}"></script>
+
+</body>
+</html>

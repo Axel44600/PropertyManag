@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="https://www.thymeleaf.org/">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${appName} + ' - Loyer'"></title>
+    <link rel="shortcut icon" type="image/x-icon" th:href="@{/favicon/favicon.ico}"/>
+    <link href="https://fonts.googleapis.com/css?family=Muli:300,300i,400,400i,600,600i,700,700i%7CComfortaa:300,400,700" rel="stylesheet">
+    <link href="https://maxcdn.icons8.com/fonts/line-awesome/1.1/css/line-awesome.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" th:href="@{/theme-assets/css/app/main.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/theme-assets/css/vendors.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/theme-assets/css/app-lite.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/theme-assets/css/core/menu/menu-types/vertical-menu.css}">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+<body class="vertical-layout vertical-menu 2-columns   menu-expanded fixed-navbar" data-open="click" data-menu="vertical-menu" data-color="bg-chartbg" data-col="2-columns">
+
+<div class="jumbotron jumbotron-fluid">
+    <div class="banniere">
+        <div class="container"></div>
+    </div>
+</div>
+
+<header id="header"></header>
+
+<div class="card" style="margin-left: 400px; margin-right: auto; width: 70%;">
+    <div class="card-header">
+        <h2>APPARTEMENT N°<span th:text="${idAppart}" /> - LOYER</h2>
+    </div>
+    <div class="card-body">
+        <blockquote class="blockquote mb-0">
+            <a href="/app/appart"><button type="button" class="btn btn-primary">Liste des appartements</button></a>
+            <button id="rchLoyer" class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseMod" aria-expanded="false" aria-controls="collapseMod">
+                Rechercher un loyer
+            </button>
+
+            <span th:if="${appart.idLoc != null}">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#thisModal">
+                Ajouter un loyer
+            </button>
+            </span>
+            <span th:unless="${appart.idLoc != null}">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" disabled>
+                Ajouter un loyer
+            </button>
+            </span>
+
+            <span th:if="${listOfLoyersPayed.size() > 1}">
+                <button id="createQuit" class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseMod1" aria-expanded="false" aria-controls="collapseMod">
+                    Générer une quittance de loyer
+                </button>
+            </span>
+            <span th:unless="${listOfLoyersPayed.size() > 1}">
+                <button id="createQuit" class="btn btn-primary" type="button" data-bs-toggle="collapse" aria-expanded="false" aria-controls="collapseMod" disabled>
+                    Générer une quittance de loyer
+                </button>
+            </span>
+            </p>
+
+            <div class="collapse" id="collapseMod">
+                <div class="card card-body">
+
+                    <form method="post" action="./researchLoyer" id="researchLoyer" class="row g-3">
+                        <div class="col-auto">
+                            <label for="inputDateL">Date :</label>
+                            <input type="number" th:value="${appart.idAppart}" name="idAppart" style="display: none" />
+                            <input type="date" style="width: 300px;" class="form-control" id="inputDateL" name="dateL" required />
+                        </div>
+                        <div class="col-auto">
+                            <label for="submit" class="visually-hidden">Submit</label>
+                            <button style="margin-top: 32px;" type="submit" id="submit" class="btn btn-primary mb-3">RECHERCHER</button>
+                        </div>
+                    </form>
+
+                        <table class="table" id="about">
+                            <thead>
+                            <tr>
+                                <th scope="col">Date</th>
+                                <th scope="col">Référence</th>
+                                <th scope="col">Montant</th>
+                                <th scope="col">Statut</th>
+                                <th scope="col"></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr id="trLoyer">
+                                <th scope="row" id="lDate"></th>
+                                <th id="lRef"></th>
+                                <td id="lMontant"></td>
+                                <td id="lStatut"></td>
+                                <td>
+                                    <form th:method="delete" action="./deleteLoyer">
+                                        <input type="number" id="idLoyerS" style="display: none;" name="idLoyer" readonly />
+                                        <button type="submit" style="border-color: #86a6df; background-color: #86a6df;" class="btn btn-primary">SUPPRIMER</button>
+                                    </form>
+                                    <a id="urlEdit">
+                                        <button type="button" style="margin-top: 6px; width: 100%;" class="btn btn-primary">MODIFIER</button>
+                                    </a>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                </div>
+            </div>
+            <div class="collapse" id="collapseMod1">
+                <div class="card card-body">
+
+                    <div id="alert" style="display: none;">
+                        <p></p>
+                        <a target="_blank"><button style="background-color: #4caf50; border: none;" class="btn btn-primary mb-3">TÉLÉCHARGER LA QUITTANCE DE LOYER</button></a>
+                    </div>
+
+                    <form method="post" action="./createQuittance" id="createQuittance" class="row g-3">
+                        <div class="col-auto">
+                            <label for="inputDateD">Date début :</label>
+                            <input type="number" name="idAppart" th:value="${appart.idAppart}" style="display: none" />
+                            <input type="date" id="inputDateD" style="width: 300px; margin-bottom: 6px;" class="form-control" name="dateD" required />
+
+                            <label for="inputDateF">Date fin :</label>
+                            <input type="date" id="inputDateF" style="width: 300px;" class="form-control" name="dateF" required />
+
+                            <label for="submit" class="visually-hidden">Submit</label>
+                            <button style="margin-top: 20px; width: 100%;" type="submit" class="btn btn-primary mb-3">GÉNÉRER</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="modal fade" id="thisModal" tabindex="-1" aria-labelledby="thisModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content" style="width: 600px;">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="thisModalLabel">Ajouter un loyer</h1>
+                            <button type="button" id="close" class="btn-close" data-bs-dismiss="modal" aria-label="Annuler"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div id="error" style="margin-bottom: 6px;"></div>
+                            <form id="createL" method="post" action="/app/appart/loyer/createLoyer">
+                                <div class="row">
+                                    <div class="col">
+                                        <label for="dateL">Date :</label>
+                                        <input type="date" class="form-control" id="dateL" name="date" required>
+                                    </div>
+                                    <div class="col">
+                                        <label for="montantL">Montant du loyer (€) :</label>
+                                        <input type="number" class="form-control" id="montantL" th:value="${appart.montantLoyer}" name="montant" readonly>
+                                    </div>
+                                </div>
+
+                                <div class="row" style="margin-top: 8px;">
+                                    <div class="col">
+                                        <label for="statutL">Statut :</label><br>
+                                        <select style="height: 40px; width: 100%;" id="statutL" name="statut">
+                                                <option value="false">Impayé</option>
+                                                <option value="true">Payé</option>
+                                        </select>
+                                    </div>
+                                    <div class="col">
+                                        <label for="orgL">Origine du paiement :</label>
+                                        <select style="height: 40px;" id="orgL" name="origine">
+                                            <option value="loc">Locataire</option>
+                                            <option value="alloc">Caisse d'allocation familiale</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="row" style="display: none;">
+                                    <div class="col">
+                                        <input type="number" class="form-control" th:value="${appart.idAppart}" name="idAppart" readonly>
+                                    </div>
+                                    <div class="col">
+
+                                    </div>
+                                </div>
+
+                                <div class="row" style="margin-top: 8px;">
+                                    <div class="col">
+                                        <input type="submit" value="VALIDER" class="btn btn-primary" />
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <p>Liste des loyers :</p>
+            <div class="container">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th scope="col">Date</th>
+                        <th scope="col">Référence</th>
+                        <th scope="col">Montant</th>
+                        <th scope="col">Statut</th>
+                        <th scope="col"></th>
+                    </tr>
+                    </thead>
+                    <tbody id="data"></tbody>
+                </table>
+            </div>
+        </blockquote>
+    </div>
+</div>
+
+<script type="text/javascript" th:src="@{/js/appart/loyer/home.js}"></script>
+
+</body>
+</html>

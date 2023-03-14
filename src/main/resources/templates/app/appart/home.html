@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org/">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${appName} + ' - Appartement'"></title>
+    <link rel="shortcut icon" type="image/x-icon" th:href="@{/favicon/favicon.ico}"/>
+    <link href="https://fonts.googleapis.com/css?family=Muli:300,300i,400,400i,600,600i,700,700i%7CComfortaa:300,400,700" rel="stylesheet">
+    <link href="https://maxcdn.icons8.com/fonts/line-awesome/1.1/css/line-awesome.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" th:href="@{/theme-assets/css/app/main.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/theme-assets/css/vendors.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/theme-assets/css/app-lite.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/theme-assets/css/core/menu/menu-types/vertical-menu.css}">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+<body class="vertical-layout vertical-menu 2-columns   menu-expanded fixed-navbar" data-open="click" data-menu="vertical-menu" data-color="bg-chartbg" data-col="2-columns">
+
+<div class="jumbotron jumbotron-fluid">
+    <div class="banniere">
+        <div class="container"></div>
+    </div>
+</div>
+
+<header id="header"></header>
+
+<div class="card" style="margin-left: 400px; margin-right: auto; width: 70%;">
+    <div class="card-header">
+        <h2>APPARTEMENT</h2>
+    </div>
+    <div class="card-body">
+        <blockquote class="blockquote mb-0">
+
+            <p>
+                <button id="rchAppart" class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseMod" aria-expanded="false" aria-controls="collapseMod">
+                    Rechercher un appartement
+                </button>
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#thisModal">
+                    Ajouter un appartement
+                </button>
+            </p>
+            <div class="collapse" id="collapseMod">
+                <div class="card card-body">
+
+                    <form method="post" action="/app/researchAppart" id="researchAppart" class="row g-3" >
+                        <div class="col-auto">
+                            <label for="inputName">Adresse :</label>
+                            <input type="text" style="width: 300px;" class="form-control" id="inputName" name="address" placeholder="Adresse de l'appartement" required>
+                        </div>
+                        <div class="col-auto">
+                            <label for="submit" class="visually-hidden">Submit</label>
+                            <button style="margin-top: 32px;" type="submit" id="submit" class="btn btn-primary mb-3">RECHERCHER</button>
+                        </div>
+                    </form>
+
+                    <table style="display: none;" id="about" class="table">
+                        <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Adresse</th>
+                            <th scope="col"></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <th id="id"></th>
+                        <td id="adresse"></td>
+                        <td>
+                            <button type="button" id="urlActions" data-bs-toggle="modal" data-bs-target="#tst" class="btn btn-primary">ACTIONS</button>
+                            <div class="modal fade1" id="uAct" tabindex="-1" aria-labelledby="actionLabelModal" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h1 class="modal-title fs-5" id="actionsLabel">Actions disponibles pour l'appartement N°<span id="idAppart"></span></h1>
+                                            <button type="button" id="actionsClose" class="btn-close" data-bs-dismiss="modal" aria-label="Annuler"></button>
+                                        </div>
+                                        <div class="modal-body" style="display: flex; flex-wrap: wrap;">
+                                            <a href="#" style="margin-top: 8px;" id="urlEdit">
+                                                <button style="margin: 2px;" type="button" class="btn btn-primary">MODIFIER</button>
+                                            </a>
+                                            <form th:method="delete" action="./deleteAppart">
+                                                <input type="number" style="display: none;" name="idAppart" readonly/>
+                                                <button type="submit" style="margin: 10px 2px 2px 2px;" class="btn btn-primary">SUPPRIMER</button>
+                                            </form>
+                                            <a href="#" id="urlSeeLoyer" style="margin-top: 8px;">
+                                                <button type="button" style="margin: 2px;" class="btn btn-primary">VOIR LOYERS</button>
+                                            </a>
+                                            <a id="urlSeeEtat" style="margin-top: 8px;">
+                                                <button style="margin: 2px;" type="button" class="btn btn-primary">VOIR ÉTAT DES LIEUX</button>
+                                            </a>
+                                            <a href="#" id="urlSeeDepot" style="margin-top: 8px;">
+                                                <button style="margin: 2px;"type="button" class="btn btn-primary">VOIR DÉPÔT DE GARANTIE</button>
+                                            </a>
+                                            <a href="#" id="urlSeeLoc" style="margin-top: 8px; display: none;">
+                                                <button style="margin: 2px;"type="button" class="btn btn-primary">VOIR LOCATAIRE ACTUEL</button>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        </tbody></table>
+
+                </div>
+            </div>
+            <div class="modal fade" id="thisModal" tabindex="-1" aria-labelledby="thisModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content" style="width: 600px;">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="thisModalLabel">Ajouter un appartement</h1>
+                            <button type="button" id="close" class="btn-close" data-bs-dismiss="modal" aria-label="Annuler"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div id="error" style="margin-bottom: 6px;"></div>
+                            <form id="createA" method="post" action="./createAppart">
+                                <div class="row">
+                                    <div class="col">
+                                        <label for="adressF">Adresse :</label>
+                                        <input type="text" class="form-control" minlength="10" id="adressF" maxlength="50" name="adressForm" required />
+                                    </div>
+                                    <div class="col">
+                                        <label for="adressCompF">Complément d'adresse :</label>
+                                        <input type="text" class="form-control" id="adressCompF" name="adressCompForm" />
+                                    </div>
+                                </div>
+
+                                <div class="row" style="margin-top: 8px;">
+                                    <div class="col">
+                                        <label for="villeF">Ville :</label>
+                                        <input type="text" class="form-control" id="villeF" maxlength="45" name="villeForm" required />
+                                    </div>
+                                    <div class="col">
+                                        <label for="cPostalF">Code postal :</label>
+                                        <input type="number" class="form-control" minlength="5" min="01000" max="99000" id="cPostalF" name="cPostalForm" required />
+                                    </div>
+                                </div>
+
+                                <div class="row" style="margin-top: 8px;">
+                                    <div class="col">
+                                        <label for="loyerF">Loyer (HC) € :</label>
+                                        <input type="number" class="form-control" id="loyerF" min="0" name="loyerForm" required />
+                                    </div>
+                                    <div class="col">
+                                        <label for="chargesF">Charges € :</label>
+                                        <input type="number" class="form-control" id="chargesF" min="0" name="chargesForm" required />
+                                    </div>
+                                </div>
+
+                                <div class="row" style="margin-top: 8px;">
+                                    <div class="col">
+                                        <label for="depotGF">Dépôt de garantie € :</label>
+                                        <input type="number" class="form-control" id="depotGF" min="0" name="depotGForm" required />
+                                    </div>
+                                    <div class="col">
+                                        <label for="dateEtatF">Date de construction :</label>
+                                        <input type="date" class="form-control" id="dateEtatF" name="dateForm" required />
+                                    </div>
+                                </div>
+
+                                <div class="row" style="margin-top: 8px;">
+                                    <div class="col">
+                                        <input type="submit" value="VALIDER" class="btn btn-primary" />
+                                    </div>
+                                </div>
+
+                            </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+            <p>Liste des appartements :</p>
+            <div class="container">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Adresse</th>
+                        <th scope="col"></th>
+                    </tr>
+                    </thead>
+                    <tbody id="data">
+
+                    </tbody>
+                </table>
+            </div>
+        </blockquote>
+    </div>
+</div>
+
+<script type="text/javascript" th:src="@{/js/appart/home.js}"></script>
+
+</body>
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="https://www.thymeleaf.org/">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${appName} + ' - Dépot de garantie'"></title>
+    <link rel="shortcut icon" type="image/x-icon" th:href="@{/favicon/favicon.ico}"/>
+    <link href="https://fonts.googleapis.com/css?family=Muli:300,300i,400,400i,600,600i,700,700i%7CComfortaa:300,400,700" rel="stylesheet">
+    <link href="https://maxcdn.icons8.com/fonts/line-awesome/1.1/css/line-awesome.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" th:href="@{/theme-assets/css/app/main.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/theme-assets/css/vendors.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/theme-assets/css/app-lite.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/theme-assets/css/core/menu/menu-types/vertical-menu.css}">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+<body class="vertical-layout vertical-menu 2-columns   menu-expanded fixed-navbar" data-open="click" data-menu="vertical-menu" data-color="bg-chartbg" data-col="2-columns">
+
+<div class="jumbotron jumbotron-fluid">
+    <div class="banniere">
+        <div class="container"></div>
+    </div>
+</div>
+
+<header id="header"></header>
+
+<div class="card" style="margin-left: 400px; margin-right: auto; width: 70%;">
+    <div class="card-header">
+        <h2>APPARTEMENT N°<span th:text="${idAppart}" /> - DÉPOT DE GARANTIE</h2>
+    </div>
+    <div class="card-body">
+        <blockquote class="blockquote mb-0">
+            <div id="error" style="margin-bottom: 6px;"></div>
+            <a href="/app/appart"><button type="button" class="btn btn-primary">Liste des appartements</button></a>
+            </p>
+
+            <p>Liste des dépôts de garantie :</p>
+            <div class="container">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th scope="col">Référence</th>
+                        <th scope="col">Montant</th>
+                        <th scope="col">Statut du paiement</th>
+                        <th scope="col"></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="d: ${listOfDepots}" th:if="${d.statut}" style="background-color: #4caf50; color: #fff;">
+                        <th scope="row" th:text="${d.ref}"></th>
+                        <td th:text="${d.montant} + '€'"></td>
+                        <td>Reçu</td>
+                        <td></td>
+                    </tr>
+                    <tr th:each="d: ${listOfDepots}" th:unless="${d.statut}" style="background-color: #fa626b; color: #fff;">
+                        <th scope="row" th:text="${d.ref}"></th>
+                        <td th:text="${d.montant} + '€'"></td>
+                        <td>En attente</td>
+                        <td>
+                            <form id="validDepot" action="/app/appart/depotGarantie/validDepot" method="post">
+                                <input type="text" th:value="${d.idDepot}" name="idDepot" style="display: none;" readonly/>
+                                <button type="submit" style="border-color: #86a6df; background-color: #86a6df;" class="btn btn-primary">VALIDER</button>
+                            </form>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </blockquote>
+    </div>
+</div>
+
+<script type="text/javascript" th:src="@{/js/appart/home.js}"></script>
+
+</body>
+</html>

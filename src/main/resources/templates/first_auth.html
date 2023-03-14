@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="https://www.thymeleaf.org/">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${appName}+' - Première connexion'"></title>
+    <link rel="shortcut icon" type="image/x-icon" th:href="@{/favicon/favicon.ico}"/>
+    <link rel="stylesheet" th:href="@{/css/first-auth.css}" />
+</head>
+<body>
+
+<div class="first-login-page">
+    <div class="form">
+        <img th:src="@{/img/logo.png}" />
+        <div id="alert"></div>
+        <form id="formFirst" action="first_auth" method="post" class="login-form">
+            <input type="text" name="registerKey" placeholder="Clé d'enregistrement" required/>
+            <input type="text" name="pseudo" placeholder="Pseudonyme" required/>
+            <input type="password" name="password" placeholder="Mot de passe" required />
+            <input type="password" name="repassword" placeholder="Confirmer le mot de passe" required />
+            <input type="submit" value="valider" />
+            <p class="message">Vous avez déjà un compte ? <a href="./auth">Se connecter</a></p>
+        </form>
+    </div>
+</div>
+
+<script type="text/javascript" th:src="@{/js/first-auth.js}"></script>
+
+</body>
+</html>

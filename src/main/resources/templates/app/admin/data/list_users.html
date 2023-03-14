@@ -1,0 +1,20 @@
+<tr th:each="l : ${listOfUsers}">
+  <th scope="row" th:text="${l.id}"></th>
+  <td style="text-transform: uppercase" th:text="${l.nom}"></td>
+  <td th:text="${l.prenom}"></td>
+  <td th:text="${l.pseudo}"></td>
+  <div th:if="${l.role.name() == 'ADMIN'}">
+    <td>Gérant</td>
+  </div>
+  <div th:unless="${l.role.name() == 'ADMIN'}">
+    <td>Employé</td>
+  </div>
+  <td><a th:href="@{./editUser/{lId}(lId=${l.id})}"><button type="button" style="border-color: #86a6df; background-color: #86a6df;"class="btn btn-primary">MODIFIER</button></a></td>
+  <td th:if="${l.id != user.id}">
+    <form th:method="delete" action="./deleteUser">
+      <input type="number" th:value="${l.id}" style="display: none;" name="id" readonly/>
+      <button type="submit" style="border-color: #86a6df; background-color: #86a6df;"class="btn btn-primary">SUPPRIMER</button>
+    </form>
+  </td>
+  <td th:unless="${l.id != user.id}"><button disabled="true" type="button" style="border-color: #86a6df; background-color: #86a6df;"class="btn btn-primary">SUPPRIMER</button></td>
+</tr>

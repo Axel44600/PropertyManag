@@ -42,6 +42,12 @@ public class AppartController implements PathConfig {
         return "/app/appart/home";
     }
 
+    @GetMapping("/data/listOfApparts")
+    public String getListOfApparts(Model model) {
+        model.addAttribute("listOfApparts", appartService.getListOfApparts());
+        return "/app/appart/data/list_apparts";
+    }
+
     @GetMapping("/editAppart/{idAppart}")
     public String getEditApart(@PathVariable(name = "idAppart") Integer idAppart, HttpServletResponse response, Model model) throws IOException {
         try {

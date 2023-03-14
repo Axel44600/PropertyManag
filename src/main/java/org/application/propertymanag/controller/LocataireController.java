@@ -46,6 +46,12 @@ public class LocataireController implements PathConfig {
         return "/app/loc/home";
     }
 
+    @GetMapping("/data/listOfLocs")
+    public String getListOfLocataires(Model model) {
+        model.addAttribute("listOfLocataires", locataireService.getListOfLocataires());
+        return "/app/loc/data/list_locataires";
+    }
+
     @GetMapping("/editLocataire/{lastName}")
     public String getEditLoc(@PathVariable(name = "lastName") String nom, Authentication authentication, HttpServletResponse response, Model model) throws IOException {
         if(locataireService.getLocataireByNom(nom) != null) {
@@ -82,7 +88,7 @@ public class LocataireController implements PathConfig {
         }
     }
 
-    @PostMapping(value = "/home", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/createLoc", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @Secured({"ADMIN", "EMPLOYE"})
     public String createLoc(@ModelAttribute @Valid CreateLocForm form, BindingResult bindingResult){

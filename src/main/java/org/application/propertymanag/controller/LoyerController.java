@@ -53,6 +53,13 @@ public class LoyerController implements PathConfig {
         return "/app/appart/loyer/home";
     }
 
+    @GetMapping("/data/listOfLoyers/{idAppart}")
+    public String getListOfLoyers(@PathVariable(value = "idAppart") Integer idAppart, Model model) {
+        List<Loyer> listOfLoyers = appartService.getListOfLoyers().stream().filter(loyer -> loyer.getIdAppart().getIdAppart().equals(idAppart)).toList();
+        model.addAttribute("listOfLoyers", listOfLoyers);
+        return "/app/appart/loyer/data/list_loyers";
+    }
+
     @GetMapping("/editLoyer/{idLoyer}")
     public String getEditLoyer(@PathVariable(name = "idLoyer") Integer idLoyer, HttpServletResponse response, Model model) throws IOException {
         if(appartService.getLoyerById(idLoyer) != null) {
@@ -70,7 +77,7 @@ public class LoyerController implements PathConfig {
     @PostMapping(value = "/researchLoyer", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @Secured({"ADMIN", "EMPLOYE"})
-    public String createQuittance(@RequestParam(name = "dateL") LocalDate date, @RequestParam(name = "idAppart") Integer idAppart) {
+    public String findLoyer(@RequestParam(name = "dateL") LocalDate date, @RequestParam(name = "idAppart") Integer idAppart) {
         if(date != null){
             Loyer l = appartService.getLoyerByDate(date);
             if(l != null && l.getIdAppart().getIdAppart().equals(idAppart)) {

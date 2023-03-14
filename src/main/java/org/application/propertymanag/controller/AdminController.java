@@ -44,6 +44,13 @@ public class AdminController implements PathConfig {
         return "/app/admin/home";
     }
 
+    @GetMapping("/data/listOfUsers")
+    public String getListOfUsers(Model model, Authentication auth) {
+        model.addAttribute("listOfUsers", adminService.getListOfUsers());
+        model.addAttribute("user", adminService.getUserByPseudo(auth.getName()));
+        return "/app/admin/data/list_users";
+    }
+
     @GetMapping("/editUser/{id}")
     public String getEditUser(@PathVariable(name = "id") Integer id, HttpServletResponse response, Model model) throws IOException {
         try {
@@ -65,10 +72,9 @@ public class AdminController implements PathConfig {
     @Secured("ADMIN")
     public String findUser(@RequestParam(name = "name") String nom, Authentication auth) {
         String nomM = mainService.maj(nom);
-        boolean userFound = adminService.getListOfUsers().stream().anyMatch(
-              users -> users.getNom().equals(nomM));
+        boolean userFound = adminService.getListOfUsers().stream().anyMatch(users -> users.getNom().equals(nomM));
 
-        if (userFound) {
+        if(userFound) {
             Users u = adminService.getUserByNom(nomM);
             String itsMe = "no";
             if(u.getPseudo().equals(auth.getName())) {

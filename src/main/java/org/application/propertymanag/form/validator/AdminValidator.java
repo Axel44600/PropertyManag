@@ -67,7 +67,7 @@ public class AdminValidator {
                     result = "{\"error\": \"one\"}";
                 }
             } else {
-                result = "{\"nochange\": \"yes\"}";
+                result = "{\"nochange\": true}";
             }
         return result;
     }

@@ -1,6 +1,5 @@
 package org.application.propertymanag.controller;
 
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.application.propertymanag.configuration.PathConfig;
 import org.application.propertymanag.entity.Locataire;
@@ -19,7 +18,6 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.util.Objects;
 
 @Controller
@@ -53,23 +51,17 @@ public class LocataireController implements PathConfig {
     }
 
     @GetMapping("/editLocataire/{lastName}")
-    public String getEditLoc(@PathVariable(name = "lastName") String nom, Authentication authentication, HttpServletResponse response, Model model) throws IOException {
-        if(locataireService.getLocataireByNom(nom) != null) {
-            model.addAttribute("locataire", locataireService.getLocataireByNom(nom));
-            model.addAttribute("appName", APP_NAME);
-            model.addAttribute("pseudo", authentication.getName());
-            return "/app/loc/edit_locataire";
-        } else {
-            response.sendRedirect("/app/home");
-            return "/app/loc/home";
-        }
+    public String getEditLoc(@PathVariable(name = "lastName") String nom, Authentication authentication, Model model) {
+         model.addAttribute("locataire", locataireService.getLocataireByNom(nom));
+         model.addAttribute("appName", APP_NAME);
+         model.addAttribute("pseudo", authentication.getName());
+         return "/app/loc/edit_locataire";
     }
 
     @PostMapping(value = "/researchLoc", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @Secured({"ADMIN", "EMPLOYE"})
     public String findLoc(@RequestParam(name = "name") String lastName) {
-
         String realLastName = mainService.maj(lastName);
         boolean lastNameFound = locataireService.getListOfLocataires().stream().anyMatch(locataire -> locataire.getNom().equals(realLastName));
 

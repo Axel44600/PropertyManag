@@ -1,16 +1,17 @@
 <!DOCTYPE html>
 <html lang="fr" xmlns:th="https://www.thymeleaf.org/">
-<script>
-    function Redirect() {
-        window.location="/auth";
-    }
-    setTimeout('Redirect()', 1000);
-</script>
 <head>
     <meta charset="UTF-8">
     <title th:text="${appName}"></title>
 </head>
 <body onload="Redirect()">
+
+<script type="text/javascript">
+    function Redirect() {
+        window.location="/auth";
+    }
+    setTimeout('Redirect()', 1000);
+</script>
 
 </body>
 </html>

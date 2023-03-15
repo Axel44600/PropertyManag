@@ -7,15 +7,15 @@ import jakarta.validation.constraints.Size;
 public class FirstAuthForm {
 
     @NotEmpty(message = "Veuillez saisir un pseudonyme.")
-    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*\\d).+$", message = "Le pseudonyme est incorrect, veuillez relire la notice.")
+    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*\\d).+$", message = "Votre pseudonyme doit contenir une majuscule ainsi qu'un chiffre.")
     @Size(min = 6, message = "Le pseudonyme est trop court.")
     private String pseudo;
     @NotEmpty(message = "Veuillez saisir un mot de passe.")
-    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*[ -\\/:-@\\[-\\`{-~])(?=.*\\d).+$", message = "Le mot de passe est incorrect, veuillez relire la notice.")
+    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*[ -\\/:-@\\[-\\`{-~])(?=.*\\d).+$", message = "Votre mot de passe doit contenir une majuscule, un chiffre ainsi qu'un caractère spécial.")
     @Size(min = 8, message = "Le mot de passe est trop court.")
     private String password;
     @NotEmpty(message = "Veuillez confirmer votre mot de passe.")
-    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*[ -\\/:-@\\[-\\`{-~])(?=.*\\d).+$", message = "Le mot de passe est incorrect, veuillez relire la notice.")
+    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*[ -\\/:-@\\[-\\`{-~])(?=.*\\d).+$", message = "Votre mot de passe doit contenir une majuscule, un chiffre ainsi qu'un caractère spécial.")
     @Size(min = 8, message = "Le mot de passe est trop court.")
     private String repassword;
     @NotEmpty(message = "Veuillez renseigner la clé d'enregistrement.")

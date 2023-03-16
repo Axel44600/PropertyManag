@@ -1,5 +1,10 @@
 package org.application.propertymanag.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.application.propertymanag.configuration.PathConfig;
 import org.application.propertymanag.entity.Locataire;
@@ -21,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Objects;
 
 @Controller
+@Tag(name = "Locataire")
 @RequestMapping("/app")
 public class LocataireController implements PathConfig {
 
@@ -37,21 +43,38 @@ public class LocataireController implements PathConfig {
     }
 
     @GetMapping("/home")
+    @Operation(summary = "Page locataire")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Affichage de la page locataire"),
+            @ApiResponse(responseCode = "403", description = "Accès interdit, redirection vers la page d'authentification"),
+            @ApiResponse(responseCode = "404", description = "Page introuvable")
+    })
     public String getHome(Authentication authentication, Model model) {
         model.addAttribute("appName", APP_NAME);
         model.addAttribute("userFirstName", adminService.getUserByPseudo(authentication.getName()).getPrenom());
-        model.addAttribute("listOfLocataires", locataireService.getListOfLocataires());
         return "/app/loc/home";
     }
 
     @GetMapping("/data/listOfLocs")
+    @Operation(summary = "Liste des locataires")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Récupération de la liste des locataires"),
+            @ApiResponse(responseCode = "403", description = "Accès interdit, redirection vers la page d'authentification"),
+            @ApiResponse(responseCode = "404", description = "Page introuvable")
+    })
     public String getListOfLocataires(Model model) {
         model.addAttribute("listOfLocataires", locataireService.getListOfLocataires());
         return "/app/loc/data/list_locataires";
     }
 
     @GetMapping("/editLocataire/{lastName}")
-    public String getEditLoc(@PathVariable(name = "lastName") String nom, Authentication authentication, Model model) {
+    @Operation(summary = "À propos d'un locataire")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Récupération des informations d'un locataire"),
+            @ApiResponse(responseCode = "403", description = "Accès interdit, redirection vers la page d'authentification"),
+            @ApiResponse(responseCode = "404", description = "Page introuvable")
+    })
+    public String getEditLoc(@Parameter(description = "Nom du locataire") @PathVariable(name = "lastName") String nom, Authentication authentication, Model model) {
          model.addAttribute("locataire", locataireService.getLocataireByNom(nom));
          model.addAttribute("appName", APP_NAME);
          model.addAttribute("pseudo", authentication.getName());
@@ -61,7 +84,13 @@ public class LocataireController implements PathConfig {
     @PostMapping(value = "/researchLoc", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @Secured({"ADMIN", "EMPLOYE"})
-    public String findLoc(@RequestParam(name = "name") String lastName) {
+    @Operation(summary = "Rechercher un locataire")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Locataire trouvé, affichage de ses informations"),
+            @ApiResponse(responseCode = "403", description = "Opération interdite"),
+            @ApiResponse(responseCode = "405", description = "Ce locataire n'existe pas")
+    })
+    public String findLoc(@Parameter(description = "Nom du locataire") @RequestParam(name = "name") String lastName) {
         String realLastName = mainService.maj(lastName);
         boolean lastNameFound = locataireService.getListOfLocataires().stream().anyMatch(locataire -> locataire.getNom().equals(realLastName));
 
@@ -83,6 +112,12 @@ public class LocataireController implements PathConfig {
     @PostMapping(value = "/createLoc", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @Secured({"ADMIN", "EMPLOYE"})
+    @Operation(summary = "Créer un profil locataire")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Création d'un profil locataire"),
+            @ApiResponse(responseCode = "403", description = "Opération interdite"),
+            @ApiResponse(responseCode = "405", description = "L'une des informations saisies ne respectent pas le CreateLocForm")
+    })
     public String createLoc(@ModelAttribute @Valid CreateLocForm form, BindingResult bindingResult){
         if(bindingResult.hasErrors()) {
             return "{\"error\": \"three\"," +
@@ -95,6 +130,12 @@ public class LocataireController implements PathConfig {
     @PostMapping(value = "/editLocataire", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @Secured({"ADMIN", "EMPLOYE"})
+    @Operation(summary = "Modifier le profil d'un locataire")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Modification d'un profil locataire"),
+            @ApiResponse(responseCode = "403", description = "Opération interdite"),
+            @ApiResponse(responseCode = "405", description = "L'une des informations saisies ne respectent pas le UpdateLocForm")
+    })
     public String editLoc(@ModelAttribute @Valid UpdateLocForm form, BindingResult bindingResult) {
         if(bindingResult.hasErrors()) {
             return "{\"error\": \"three\"," +

@@ -1,5 +1,10 @@
 package org.application.propertymanag.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import org.application.propertymanag.configuration.PathConfig;
 import org.application.propertymanag.entity.DepotDeGarantie;
@@ -14,6 +19,7 @@ import java.io.IOException;
 import java.util.List;
 
 @Controller
+@Tag(name = "Dépôt de garantie")
 @RequestMapping("/app/appart/depotGarantie")
 public class GarantieController implements PathConfig {
 
@@ -25,7 +31,13 @@ public class GarantieController implements PathConfig {
     }
 
     @GetMapping("/{idAppart}")
-    public String getHome(@PathVariable(value = "idAppart") Integer idAppart, Model model) {
+    @Operation(summary = "Liste des dépôts de garantie")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Affichage de la liste des dépôts de garantie"),
+            @ApiResponse(responseCode = "403", description = "Accès interdit, redirection vers la page d'authentification"),
+            @ApiResponse(responseCode = "404", description = "Page introuvable")
+    })
+    public String getHome(@Parameter(description = "ID de l'appartement") @PathVariable(value = "idAppart") Integer idAppart, Model model) {
         model.addAttribute("appName", APP_NAME);
         List<DepotDeGarantie> listOfDepots = appartService.getListOfDepots().stream().filter(
                 garantie -> garantie.getIdAppart().getIdAppart().equals(idAppart)).toList();
@@ -36,7 +48,13 @@ public class GarantieController implements PathConfig {
 
     @PostMapping(value = "/validDepot")
     @Secured({"ADMIN", "EMPLOYE"})
-    public void editDepot(@RequestParam(name = "idDepot") Integer idDepot, HttpServletResponse response) throws IOException {
+    @Operation(summary = "Valider le reçu d'un dépôt de garantie")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Validation d'un dépôt de garantie"),
+            @ApiResponse(responseCode = "403", description = "Opération interdite"),
+            @ApiResponse(responseCode = "405", description = "Ce dépôt de garantie n'existe pas")
+    })
+    public void editDepot(@Parameter(description = "ID du dépôt de garantie") @RequestParam(name = "idDepot") Integer idDepot, HttpServletResponse response) throws IOException {
         if(idDepot != null) {
             DepotDeGarantie d = appartService.getDepotById(idDepot);
             d.setStatut(true);

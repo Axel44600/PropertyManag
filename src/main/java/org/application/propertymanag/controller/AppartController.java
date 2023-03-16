@@ -1,5 +1,10 @@
 package org.application.propertymanag.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.application.propertymanag.configuration.PathConfig;
@@ -20,6 +25,7 @@ import java.io.IOException;
 import java.util.*;
 
 @Controller
+@Tag(name = "Appartement")
 @RequestMapping("/app")
 public class AppartController implements PathConfig {
 
@@ -36,6 +42,12 @@ public class AppartController implements PathConfig {
     }
 
     @GetMapping("/appart")
+    @Operation(summary = "Page appartement")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Affichage de la page appartement"),
+            @ApiResponse(responseCode = "403", description = "Accès interdit, redirection vers la page d'authentification"),
+            @ApiResponse(responseCode = "404", description = "Page introuvable")
+    })
     public String getHome(Model model) {
         model.addAttribute("appName", APP_NAME);
         model.addAttribute("listOfApparts", appartService.getListOfApparts());
@@ -43,13 +55,25 @@ public class AppartController implements PathConfig {
     }
 
     @GetMapping("/data/listOfApparts")
+    @Operation(summary = "Liste des appartements")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Récupération de la liste des appartements"),
+            @ApiResponse(responseCode = "403", description = "Accès interdit, redirection vers la page d'authentification"),
+            @ApiResponse(responseCode = "404", description = "Page introuvable")
+    })
     public String getListOfApparts(Model model) {
         model.addAttribute("listOfApparts", appartService.getListOfApparts());
         return "/app/appart/data/list_apparts";
     }
 
     @GetMapping("/editAppart/{idAppart}")
-    public String getEditApart(@PathVariable(name = "idAppart") Integer idAppart, HttpServletResponse response, Model model) throws IOException {
+    @Operation(summary = "À propos d'un appartement")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Récupération des informations d'un appartement"),
+            @ApiResponse(responseCode = "403", description = "Accès interdit, redirection vers la page d'authentification"),
+            @ApiResponse(responseCode = "404", description = "Page introuvable")
+    })
+    public String getEditApart(@Parameter(description = "ID de l'appartement") @PathVariable(name = "idAppart") Integer idAppart, HttpServletResponse response, Model model) throws IOException {
         try {
             Appartement appart = appartService.getAppartById(idAppart);
             model.addAttribute("appart", appart);
@@ -73,7 +97,13 @@ public class AppartController implements PathConfig {
     @PostMapping(value = "/researchAppart", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @Secured({"ADMIN", "EMPLOYE"})
-    public String findApart(@RequestParam(name = "address") String value) {
+    @Operation(summary = "Rechercher un appartement")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Appartement trouvé, affichage des informations de l'appartement"),
+            @ApiResponse(responseCode = "403", description = "Opération interdite"),
+            @ApiResponse(responseCode = "405", description = "Cet appartement n'existe pas")
+    })
+    public String findApart(@Parameter(description = "Adresse de l'appartement") @RequestParam(name = "address") String value) {
             boolean appartFound = appartService.getListOfApparts().stream().anyMatch(
                     appartement -> appartement.getAdresse().equals(value));
 
@@ -96,6 +126,12 @@ public class AppartController implements PathConfig {
     @PostMapping(value = "/createAppart", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @Secured({"ADMIN", "EMPLOYE"})
+    @Operation(summary = "Créer un appartement")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Création d'un appartement"),
+            @ApiResponse(responseCode = "403", description = "Opération interdite"),
+            @ApiResponse(responseCode = "405", description = "L'une des informations saisies ne respectent pas le CreateAppartForm")
+    })
     public String createApart(@ModelAttribute @Valid CreateAppartForm form, BindingResult bindingResult) {
         if(bindingResult.hasErrors()) {
             return "{\"error\": \"one\"," +
@@ -108,6 +144,12 @@ public class AppartController implements PathConfig {
     @PostMapping(value = "/editAppart", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @Secured({"ADMIN", "EMPLOYE"})
+    @Operation(summary = "Modifier un appartement")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Modification d'un appartement"),
+            @ApiResponse(responseCode = "403", description = "Opération interdite"),
+            @ApiResponse(responseCode = "405", description = "L'une des informations saisies ne respectent pas le UpdateAppartForm")
+    })
     public String editApart(@ModelAttribute @Valid UpdateAppartForm form, BindingResult bindingResult) {
         if(bindingResult.hasErrors()) {
             return "{\"error\": \"two\"," +
@@ -118,7 +160,13 @@ public class AppartController implements PathConfig {
     }
 
     @DeleteMapping(value = "/deleteAppart")
-    public void deleteUser(@RequestParam("idAppart") Integer idAppart, HttpServletResponse response) throws IOException {
+    @Operation(summary = "Supprimer un appartement")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Suppression d'un appartement"),
+            @ApiResponse(responseCode = "403", description = "Opération interdite"),
+            @ApiResponse(responseCode = "405", description = "Cet appartement n'existe pas")
+    })
+    public void deleteUser(@Parameter(description = "ID de l'appartement") @RequestParam("idAppart") Integer idAppart, HttpServletResponse response) throws IOException {
         if(idAppart != null) {
             Appartement a = appartService.getAppartById(idAppart);
             appartService.deleteAppart(a);

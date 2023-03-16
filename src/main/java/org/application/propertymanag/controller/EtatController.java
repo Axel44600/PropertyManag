@@ -1,5 +1,10 @@
 package org.application.propertymanag.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.application.propertymanag.configuration.PathConfig;
@@ -21,6 +26,7 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 
 @Controller
+@Tag(name = "État des lieux")
 @RequestMapping("/app/appart/etat")
 public class EtatController implements PathConfig {
 
@@ -33,17 +39,27 @@ public class EtatController implements PathConfig {
     }
 
     @GetMapping("/{idAppart}")
-    public String getHome(@PathVariable(value = "idAppart") Integer idAppart, Model model) {
+    @Operation(summary = "Liste des états des lieux")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Affichage de la liste des états des lieux"),
+            @ApiResponse(responseCode = "403", description = "Accès interdit, redirection vers la page d'authentification"),
+            @ApiResponse(responseCode = "404", description = "Page introuvable")
+    })
+    public String getHome(@Parameter(description = "ID de l'appartement") @PathVariable(value = "idAppart") Integer idAppart, Model model) {
         model.addAttribute("appName", APP_NAME);
-        List<EtatDesLieux> listOfEtats = appartService.getListOfEtats().stream().filter(
-                etatDesLieux -> etatDesLieux.getIdAppart().getIdAppart().equals(idAppart)).toList();
-
+        List<EtatDesLieux> listOfEtats = appartService.getListOfEtats().stream().filter(etatDesLieux -> etatDesLieux.getIdAppart().getIdAppart().equals(idAppart)).toList();
         model.addAttribute("listOfEtats", listOfEtats);
         return "/app/appart/etat/home";
     }
 
     @GetMapping("/editEtat/{idEtat}")
-    public String getEditEtat(@PathVariable(name = "idEtat") Integer idEtat, HttpServletResponse response, Model model) throws IOException {
+    @Operation(summary = "À propos d'un état des lieux")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Récupération des informations d'un état des lieux"),
+            @ApiResponse(responseCode = "403", description = "Accès interdit, redirection vers la page d'authentification"),
+            @ApiResponse(responseCode = "404", description = "Page introuvable")
+    })
+    public String getEditEtat(@Parameter(description = "ID de l'état des lieux") @PathVariable(name = "idEtat") Integer idEtat, HttpServletResponse response, Model model) throws IOException {
         try {
             EtatDesLieux etat = appartService.getEtatById(idEtat);
             model.addAttribute("etat", etat);
@@ -59,6 +75,12 @@ public class EtatController implements PathConfig {
     @PostMapping(value = "/editEtat", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @Secured({"ADMIN", "EMPLOYE"})
+    @Operation(summary = "Modifier un état des lieux")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Modification d'un état des lieux"),
+            @ApiResponse(responseCode = "403", description = "Opération interdite"),
+            @ApiResponse(responseCode = "405", description = "L'une des informations saisies ne respectent pas le UpdateEtatForm")
+    })
     public String editEtat(@ModelAttribute @Valid UpdateEtatForm form, BindingResult bindingResult) {
         if(bindingResult.hasErrors()) {
             return "{\"error\": \"one\"," +

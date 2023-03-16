@@ -1,5 +1,10 @@
 package org.application.propertymanag.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.application.propertymanag.configuration.PathConfig;
@@ -23,6 +28,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Controller
+@Tag(name = "Loyer")
 @RequestMapping("/app/appart/loyer")
 public class LoyerController implements PathConfig {
 
@@ -39,7 +45,13 @@ public class LoyerController implements PathConfig {
     }
 
     @GetMapping("/{idAppart}")
-    public String getHome(@PathVariable(value = "idAppart") Integer idAppart, Model model) {
+    @Operation(summary = "Page loyer")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Affichage de la page loyer"),
+            @ApiResponse(responseCode = "403", description = "Accès interdit, redirection vers la page d'authentification"),
+            @ApiResponse(responseCode = "404", description = "Page introuvable")
+    })
+    public String getHome(@Parameter(description = "ID de l'appartement") @PathVariable(value = "idAppart") Integer idAppart, Model model) {
         List<Loyer> listOfLoyers = appartService.getListOfLoyers().stream().filter(
                 loyer -> loyer.getIdAppart().getIdAppart().equals(idAppart)).toList();
         List<Loyer> listOfLoyersPayed = appartService.getListOfLoyers().stream().filter(
@@ -54,14 +66,26 @@ public class LoyerController implements PathConfig {
     }
 
     @GetMapping("/data/listOfLoyers/{idAppart}")
-    public String getListOfLoyers(@PathVariable(value = "idAppart") Integer idAppart, Model model) {
+    @Operation(summary = "Liste des loyers")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Récupération de la liste des loyers"),
+            @ApiResponse(responseCode = "403", description = "Accès interdit, redirection vers la page d'authentification"),
+            @ApiResponse(responseCode = "404", description = "Page introuvable")
+    })
+    public String getListOfLoyers(@Parameter(description = "ID de l'appartement") @PathVariable(value = "idAppart") Integer idAppart, Model model) {
         List<Loyer> listOfLoyers = appartService.getListOfLoyers().stream().filter(loyer -> loyer.getIdAppart().getIdAppart().equals(idAppart)).toList();
         model.addAttribute("listOfLoyers", listOfLoyers);
         return "/app/appart/loyer/data/list_loyers";
     }
 
     @GetMapping("/editLoyer/{idLoyer}")
-    public String getEditLoyer(@PathVariable(name = "idLoyer") Integer idLoyer, HttpServletResponse response, Model model) throws IOException {
+    @Operation(summary = "À propos d'un loyer")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Récupération des informations d'un loyer"),
+            @ApiResponse(responseCode = "403", description = "Accès interdit, redirection vers la page d'authentification"),
+            @ApiResponse(responseCode = "404", description = "Page introuvable")
+    })
+    public String getEditLoyer(@Parameter(description = "ID du loyer") @PathVariable(name = "idLoyer") Integer idLoyer, HttpServletResponse response, Model model) throws IOException {
         if(appartService.getLoyerById(idLoyer) != null) {
             Loyer l = appartService.getLoyerById(idLoyer);
             model.addAttribute("loyer", l);
@@ -77,7 +101,13 @@ public class LoyerController implements PathConfig {
     @PostMapping(value = "/researchLoyer", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @Secured({"ADMIN", "EMPLOYE"})
-    public String findLoyer(@RequestParam(name = "dateL") LocalDate date, @RequestParam(name = "idAppart") Integer idAppart) {
+    @Operation(summary = "Rechercher un loyer")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Loyer trouvé, affichage des informations du loyer"),
+            @ApiResponse(responseCode = "403", description = "Opération interdite"),
+            @ApiResponse(responseCode = "405", description = "Aucun loyer trouvé à cette date")
+    })
+    public String findLoyer(@Parameter(description = "Date du loyer") @RequestParam(name = "dateL") LocalDate date, @Parameter(description = "ID de l'appartement") @RequestParam(name = "idAppart") Integer idAppart) {
         if(date != null){
             Loyer l = appartService.getLoyerByDate(date);
             if(l != null && l.getIdAppart().getIdAppart().equals(idAppart)) {
@@ -106,6 +136,12 @@ public class LoyerController implements PathConfig {
     @PostMapping(value = "/createLoyer", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @Secured({"ADMIN", "EMPLOYE"})
+    @Operation(summary = "Créer un loyer")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Création d'un loyer"),
+            @ApiResponse(responseCode = "403", description = "Opération interdite"),
+            @ApiResponse(responseCode = "405", description = "L'une des informations saisies ne respectent pas le LoyerForm")
+    })
     public String createLoyer(@ModelAttribute @Valid LoyerForm form, BindingResult bindingResult) {
         if(bindingResult.hasErrors()) {
             return "{\"error\": \"three\"," +
@@ -118,6 +154,12 @@ public class LoyerController implements PathConfig {
     @PostMapping(value = "/editLoyer", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @Secured({"ADMIN", "EMPLOYE"})
+    @Operation(summary = "Modifier un loyer")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Modification d'un loyer"),
+            @ApiResponse(responseCode = "403", description = "Opération interdite"),
+            @ApiResponse(responseCode = "405", description = "L'une des informations saisies ne respectent pas le LoyerForm")
+    })
     public String editLoyer(@ModelAttribute @Valid LoyerForm form, BindingResult bindingResult) {
         if(bindingResult.hasErrors()) {
             return "{\"error\": \"three\"," +
@@ -128,7 +170,13 @@ public class LoyerController implements PathConfig {
 }
 
     @DeleteMapping(value = "/deleteLoyer")
-    public void deleteLoyer(@RequestParam("idLoyer") Integer idLoyer, HttpServletResponse response) throws IOException {
+    @Operation(summary = "Supprimer un loyer")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Suppression d'un loyer"),
+            @ApiResponse(responseCode = "403", description = "Opération interdite"),
+            @ApiResponse(responseCode = "405", description = "Cet loyer n'existe pas")
+    })
+    public void deleteLoyer(@Parameter(description = "ID du loyer") @RequestParam("idLoyer") Integer idLoyer, HttpServletResponse response) throws IOException {
         if(idLoyer != null && appartService.getLoyerById(idLoyer) != null) {
                 Loyer loyer = appartService.getLoyerById(idLoyer);
                 if(Boolean.FALSE.equals(loyer.getStatut())) {
@@ -144,9 +192,15 @@ public class LoyerController implements PathConfig {
     @PostMapping(value = "/createQuittance", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @Secured({"ADMIN", "EMPLOYE"})
-    public String createQuittance(@RequestParam(name = "idAppart") Integer idAppart,
-                                  @RequestParam(name = "dateD") LocalDate dateD,
-                                  @RequestParam(name = "dateF") LocalDate dateF) {
+    @Operation(summary = "Générer une quittance de loyer")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Génération d'une quittance de loyer"),
+            @ApiResponse(responseCode = "403", description = "Opération interdite"),
+            @ApiResponse(responseCode = "405", description = "Aucun loyer n'a été trouver entre ces deux dates")
+    })
+    public String createQuittance(@Parameter(description = "ID de l'appartement") @RequestParam(name = "idAppart") Integer idAppart,
+                                  @Parameter(description = "Date du premier loyer") @RequestParam(name = "dateD") LocalDate dateD,
+                                  @Parameter(description = "Date du dernier loyer") @RequestParam(name = "dateF") LocalDate dateF) {
 
         if(idAppart != null && dateD != null && dateF != null) {
             return validator.createQuittance(appartService, locataireService, mainService, idAppart, dateD, dateF);

@@ -1,5 +1,10 @@
 package org.application.propertymanag.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.application.propertymanag.configuration.PathConfig;
@@ -23,6 +28,7 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 
 @Controller
+@Tag(name = "Administration")
 @RequestMapping("/app/admin")
 public class AdminController implements PathConfig {
 
@@ -37,14 +43,25 @@ public class AdminController implements PathConfig {
     }
 
     @GetMapping("/home")
+    @Operation(summary = "Page administration")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Affichage de la page administration"),
+            @ApiResponse(responseCode = "403", description = "Accès interdit, redirection vers la page d'authentification"),
+            @ApiResponse(responseCode = "404", description = "Page introuvable")
+    })
     public String getHome(Model model, Authentication auth) {
         model.addAttribute("appName", APP_NAME);
         model.addAttribute("user", adminService.getUserByPseudo(auth.getName()));
-        model.addAttribute("listOfUsers", adminService.getListOfUsers());
         return "/app/admin/home";
     }
 
     @GetMapping("/data/listOfUsers")
+    @Operation(summary = "Liste des utilisateurs")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Récupération de la liste des utilisateurs"),
+            @ApiResponse(responseCode = "403", description = "Accès interdit, redirection vers la page d'authentification"),
+            @ApiResponse(responseCode = "404", description = "Page introuvable")
+    })
     public String getListOfUsers(Model model, Authentication auth) {
         model.addAttribute("listOfUsers", adminService.getListOfUsers());
         model.addAttribute("user", adminService.getUserByPseudo(auth.getName()));
@@ -52,7 +69,13 @@ public class AdminController implements PathConfig {
     }
 
     @GetMapping("/editUser/{id}")
-    public String getEditUser(@PathVariable(name = "id") Integer id, HttpServletResponse response, Model model) throws IOException {
+    @Operation(summary = "À propos d'un utilisateur")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Récupération des informations d'un utilisateur"),
+            @ApiResponse(responseCode = "403", description = "Accès interdit, redirection vers la page d'authentification"),
+            @ApiResponse(responseCode = "404", description = "Page introuvable")
+    })
+    public String getEditUser(@Parameter(description = "ID de l'utilisateur") @PathVariable(name = "id") Integer id, HttpServletResponse response, Model model) throws IOException {
         try {
             Users u = adminService.getUserById(id);
             model.addAttribute("user", u);
@@ -70,7 +93,13 @@ public class AdminController implements PathConfig {
     @PostMapping(value = "/researchUser", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @Secured("ADMIN")
-    public String findUser(@RequestParam(name = "name") String nom, Authentication auth) {
+    @Operation(summary = "Rechercher un utilisateur")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Utilisateur trouvé, affichage de ses informations"),
+            @ApiResponse(responseCode = "403", description = "Opération interdite"),
+            @ApiResponse(responseCode = "405", description = "Cet utilisateur n'existe pas")
+    })
+    public String findUser(@Parameter(description = "Nom de l'utilisateur") @RequestParam(name = "name") String nom, Authentication auth) {
         String nomM = mainService.maj(nom);
         boolean userFound = adminService.getListOfUsers().stream().anyMatch(users -> users.getNom().equals(nomM));
 
@@ -97,7 +126,13 @@ public class AdminController implements PathConfig {
     @PostMapping(value = "/createUser", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @Secured("ADMIN")
-    public String createUser (@ModelAttribute @Valid CreateUserForm form, BindingResult bindingResult) {
+    @Operation(summary = "Créer un compte utilisateur")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Création d'un compte utilisateur"),
+            @ApiResponse(responseCode = "403", description = "Opération interdite"),
+            @ApiResponse(responseCode = "405", description = "L'une des informations saisies ne respectent pas le CreateUserForm")
+    })
+    public String createUser(@ModelAttribute @Valid CreateUserForm form, BindingResult bindingResult) {
         if(bindingResult.hasErrors()) {
             return "{\"error\": \"two\"," +
                     "\"msgError\": \"" + Objects.requireNonNull(bindingResult.getFieldError()).getDefaultMessage() + "\"}";
@@ -109,6 +144,12 @@ public class AdminController implements PathConfig {
     @PostMapping(value = "/editUser", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @Secured("ADMIN")
+    @Operation(summary = "Modifier un compte utilisateur")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Modification d'un compte utilisateur"),
+            @ApiResponse(responseCode = "403", description = "Opération interdite"),
+            @ApiResponse(responseCode = "405", description = "L'une des informations saisies ne respectent pas le UpdateUserForm")
+    })
     public String editUser(@ModelAttribute @Valid UpdateUserForm form, BindingResult bindingResult) {
         if(bindingResult.hasErrors()) {
             return "{\"error\": \"two\"," +
@@ -119,7 +160,13 @@ public class AdminController implements PathConfig {
     }
 
     @DeleteMapping(value = "/deleteUser")
-    public void deleteUser(@RequestParam("id") Integer id, HttpServletResponse response) throws IOException {
+    @Operation(summary = "Supprimer un compte utilisateur")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Suppression d'un compte utilisateur"),
+            @ApiResponse(responseCode = "403", description = "Opération interdite"),
+            @ApiResponse(responseCode = "405", description = "Cet utilisateur n'existe pas")
+    })
+    public void deleteUser(@Parameter(description = "ID de l'utilisateur") @RequestParam("id") Integer id, HttpServletResponse response) throws IOException {
         if(id != null && adminService.getUserById(id) != null) {
             Users user = adminService.getUserById(id);
             adminService.deleteUser(user);

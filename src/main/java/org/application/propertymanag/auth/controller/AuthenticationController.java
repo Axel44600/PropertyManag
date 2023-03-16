@@ -1,5 +1,9 @@
 package org.application.propertymanag.auth.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +23,7 @@ import java.io.IOException;
 import java.util.Objects;
 
 @Controller
+@Tag(name = "Authentification")
 @RequiredArgsConstructor
 public class AuthenticationController implements PathConfig {
 
@@ -31,6 +36,11 @@ public class AuthenticationController implements PathConfig {
     }
 
     @GetMapping("/auth")
+    @Operation(summary = "Page de connexion")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Affichage de la page de connexion"),
+            @ApiResponse(responseCode = "404", description = "Page introuvable")
+    })
     public String getAuth(Authentication authentication, HttpServletResponse response, Model model) throws IOException {
         if(authentication == null) {
             model.addAttribute("appName", APP_NAME);
@@ -41,6 +51,11 @@ public class AuthenticationController implements PathConfig {
         }
     }
 
+    @Operation(summary = "Page de première connexion")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Affichage de la page de première connexion"),
+            @ApiResponse(responseCode = "404", description = "Page introuvable")
+    })
     @GetMapping("/first_auth")
     public String getFirstAuth(Authentication authentication, HttpServletResponse response, Model model) throws IOException {
         if(authentication == null) {
@@ -53,6 +68,11 @@ public class AuthenticationController implements PathConfig {
     }
 
     @PostMapping(value = "/first_auth", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Se connecter pour la première fois")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Première connexion réussie, compte utilisateur activé"),
+            @ApiResponse(responseCode = "405", description = "L'une des informations saisies ne respectent pas le FirstAuthForm")
+    })
     @ResponseBody
     public String submitFirstAuth(@ModelAttribute @Valid FirstAuthForm form, BindingResult bindingResult) {
         if(bindingResult.hasErrors()) {

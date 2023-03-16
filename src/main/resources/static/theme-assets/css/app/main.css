@@ -12,21 +12,6 @@ body {
     color: #4b823d
 }
 
-#urlEdit button, #urlBilan button, #actions17 button[class='btn btn-primary'], button[data-bs-target='#actions17'] {
-    border-color: #86a6df;
-    background-color: #86a6df;
-}
-
-#urlEdit button:hover, #urlBilan button:hover, #actions17 button[class='btn btn-primary']:hover, button[data-bs-target='#actions17']:hover {
-    border-color: #86a6df;
-    background-color: #86a6df;
-}
-
-#urlEdit button:checked, #urlBilan button:checked, #actions17 button[class='btn btn-primary']:checked, button[data-bs-target='#actions17']:checked {
-    border-color: #86a6df;
-    background-color: #86a6df;
-}
-
 .banniere {
     background-image: url(/img/banniere.png);
     height: 300px;

@@ -5,11 +5,12 @@
     <td>Impayé</td>
     <td>
         <form th:method="delete" action="./deleteLoyer">
-            <input type="number" th:value="${l.idLoyer}" style="display: none;" name="idLoyer" readonly />
-            <button style="border-color: #86a6df; background-color: #86a6df; width: 100%;" type="submit" class="btn btn-primary">SUPPRIMER</button>
+            <label for="idLoy"></label>
+            <input type="number" id="idLoy" th:value="${l.idLoyer}" style="display: none;" name="idLoyer" readonly />
+            <button style="width: 100%;" type="submit" class="btn btn-primary">SUPPRIMER</button>
         </form>
         <a th:href="@{./editLoyer/{lId}(lId=${l.idLoyer})}">
-            <button type="button" style="margin-top: 6px; width: 100%; border-color: #86a6df; background-color: #86a6df;" class="btn btn-primary">MODIFIER</button>
+            <button type="button" style="margin-top: 6px; width: 100%;" class="btn btn-primary">MODIFIER</button>
         </a>
     </td>
 </tr>
@@ -20,8 +21,9 @@
     <td>Payé</td>
     <td>
         <form th:method="delete" action="./deleteLoyer">
-            <input type="number" th:value="${l.idLoyer}" style="display: none;" name="idLoyer" readonly />
-            <button type="submit" style="border-color: #86a6df; background-color: #86a6df;" class="btn btn-primary">SUPPRIMER</button>
+            <label for="idLoy1"></label>
+            <input type="number" id="idLoy1" th:value="${l.idLoyer}" style="display: none;" name="idLoyer" readonly />
+            <button type="submit" class="btn btn-primary">SUPPRIMER</button>
         </form>
     </td>
 </tr>

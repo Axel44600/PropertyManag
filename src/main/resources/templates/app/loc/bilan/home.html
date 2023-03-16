@@ -7,20 +7,17 @@
     <link href="https://fonts.googleapis.com/css?family=Muli:300,300i,400,400i,600,600i,700,700i%7CComfortaa:300,400,700" rel="stylesheet">
     <link href="https://maxcdn.icons8.com/fonts/line-awesome/1.1/css/line-awesome.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" th:href="@{/theme-assets/css/app/main.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/theme-assets/css/vendors.css}">
-    <link rel="stylesheet" type="text/css" th:href="@{/theme-assets/vendors/css/charts/chartist.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/theme-assets/css/app-lite.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/theme-assets/css/core/menu/menu-types/vertical-menu.css}">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    <script type="text/javascript" src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
 </head>
-<body onload="init()" style="background-color: #86a6df;" class="vertical-layout vertical-menu 2-columns   menu-expanded fixed-navbar" data-open="click" data-menu="vertical-menu" data-color="bg-chartbg" data-col="2-columns">
+<body class="vertical-layout vertical-menu 2-columns   menu-expanded fixed-navbar" data-open="click" data-menu="vertical-menu" data-color="bg-chartbg" data-col="2-columns">
 
-<div class="jumbotron jumbotron-fluid" style="background-color: #fff; margin-top: -5vh; width: 70%; color: #86a6df; margin-left: 400px;">
-    <div class="container">
-
-        </div>
+<div class="jumbotron jumbotron-fluid">
+    <div class="banniere">
+        <div class="container"></div>
     </div>
 </div>
 
@@ -63,31 +60,7 @@
     </div>
 </div>
 
-<script type="text/javascript">
-
-    // INIT
-    function init() {
-
-        // HEADER
-        async function loadHeader() {
-            await fetch("/app/header").then(res => res.text()).then(data => {
-                document.getElementById("header").innerHTML = data;
-            }).then(() => {
-        })}
-
-        loadHeader();
-    }
-
-
-    // RESET MODULE { CREER LOCATAIRE }
-    $("#close").click(function(){
-        $("#error").text("");
-        $("input[name='lastName']").prop("value", "");
-        $("input[name='firstName']").prop("value", "");
-        $("input[name='email']").prop("value", "");
-        $("input[name='tel']").prop("value", "");
-    });
-</script>
+<script type="text/javascript" th:src="@{/js/loc/home.js}"></script>
 
 </body>
 </html>

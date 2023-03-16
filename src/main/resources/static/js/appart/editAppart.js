@@ -9,7 +9,7 @@ window.addEventListener('load', function() {
         })
     }
 
-    loadHeader();
+    loadHeader().then(r => r);
 });
 
 
@@ -30,7 +30,7 @@ function editAppart(e) {
         if(data.nochange) {
             //
         } else {
-            if (data.success == "yes") {
+            if (data.success === "yes") {
                 if ((data.idEtatOut != null || data.idEtatIn != null)) {
                     if (data.idEtatOut != null && data.idEtatIn != null) {
                         result.innerHTML =
@@ -70,7 +70,7 @@ function editAppart(e) {
                         result.innerText = "";
                     }, 5000);
                 }
-            } else if (data.error == "one") {
+            } else if (data.error === "one") {
                 result.innerText = "Opération impossible, le locataire actuel n'est pas en règle sur le paiement de ses loyers.";
                 result.style.color = "red";
             } else {

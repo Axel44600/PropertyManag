@@ -9,7 +9,7 @@ window.addEventListener('load', function() {
         })
     }
 
-    loadHeader();
+    loadHeader().then(r => r);
 });
 
 
@@ -30,11 +30,11 @@ function editUser(e) {
         if(data.nochange) {
             //
         } else {
-            if(data.success == "yes") {
+            if(data.success === "yes") {
                 result.innerText = "Le compte utilisateur a été modifié avec succès.";
                 result.style.color = "green";
                 setTimeout(function() { result.innerText = ""; }, 5000);
-            } else if(data.error == "one") {
+            } else if(data.error === "one") {
                 result.innerText = "Un utilisateur est déjà enregistré sous ce nom.";
                 result.style.color = "red";
             } else {

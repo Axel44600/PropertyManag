@@ -17,7 +17,7 @@ function firstLogin(e) {
     }).then((response) => {
         return response.json();
     }).then((data) => {
-        if(data.success == "yes") {
+        if(data.success === "yes") {
             result.innerText = "Votre compte est désormais activé, redirection dans 5s...";
             result.style.color = "green";
             setTimeout('Redirect()', 5000);
@@ -25,13 +25,13 @@ function firstLogin(e) {
             document.querySelector("input[name='pseudo']").value = "";
             document.querySelector("input[name='password']").value = "";
             document.querySelector("input[name='repassword']").value = "";
-        } else if(data.error == "one") {
+        } else if(data.error === "one") {
             result.innerText = "Votre clé d'enregistrement n'est pas valide.";
             result.style.color = "red";
-        } else if(data.error == "two") {
+        } else if(data.error === "two") {
             result.innerText = "Ce pseudonyme est déjà utilisé.";
             result.style.color = "red";
-        } else if(data.error == "three") {
+        } else if(data.error === "three") {
             result.innerText = "Les mots de passe ne correspondent pas.";
             result.style.color = "red";
         } else {

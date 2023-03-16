@@ -11,7 +11,7 @@ window.addEventListener('load', function() {
         })
     }
 
-    loadHeader();
+    loadHeader().then(r => r);
     if(url.includes("appart") && !url.includes("etat") && !url.includes("depot")) {
         reload();
     }
@@ -29,7 +29,7 @@ if(url.includes("appart") && !url.includes("etat") && !url.includes("depot")) {
             })
         }
 
-        loadApparts();
+        loadApparts().then(r => r);
     }
 
 
@@ -67,7 +67,7 @@ if(url.includes("appart") && !url.includes("etat") && !url.includes("depot")) {
         }).then((response) => {
             return response.json();
         }).then((data) => {
-            if (data.success == "yes") {
+            if (data.success === "yes") {
                 result.innerText = "L'appartement a été ajouter avec succès.";
                 result.style.color = "green";
                 setTimeout(function () {
@@ -82,10 +82,10 @@ if(url.includes("appart") && !url.includes("etat") && !url.includes("depot")) {
                 document.querySelector("input[name='depotGForm']").value = "";
                 document.querySelector("input[name='dateForm']").value = "";
                 reload();
-            } else if (data.error == "one") {
+            } else if (data.error === "one") {
                 result.innerText = data.msgError;
                 result.style.color = "red";
-            } else if (data.error == "two") {
+            } else if (data.error === "two") {
                 result.innerText = "Il existe déjà un appartement enregistré à cette adresse.";
                 result.style.color = "red";
             }
@@ -109,7 +109,7 @@ if(url.includes("appart") && !url.includes("etat") && !url.includes("depot")) {
         }).then((response) => {
             return response.json();
         }).then((data) => {
-            if (data.success == "yes") {
+            if (data.success === "yes") {
                 document.getElementById("about").style.display = "block";
                 document.getElementById("id").innerText = data.id;
                 document.getElementById("idAppart").innerText = data.id;

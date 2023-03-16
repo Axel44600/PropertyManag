@@ -8,7 +8,7 @@ window.addEventListener('load', function() {
         }).then(() => {
         })}
 
-    loadHeader();
+    loadHeader().then(r => r);
     reload();
 });
 
@@ -21,7 +21,7 @@ function reload() {
             document.getElementById("data").innerHTML = data;
         }).then(() => {
     })}
-    loadUsers();
+    loadUsers().then(r => r);
 }
 
 
@@ -56,7 +56,7 @@ function createUser(e) {
     }).then((response) => {
         return response.json();
     }).then((data) => {
-        if(data.success == "yes") {
+        if(data.success === "yes") {
             result.innerHTML = "<p>Le compte utilisateur a été créer avec succès.</p>" +
                 "<p>Voici la clé d'enregistrement à transmettre à l'utilisateur concerné" +
                 "<input type='text' style='width: 100%;' value='"+data.key+"' readonly /></p>";
@@ -64,7 +64,7 @@ function createUser(e) {
             document.querySelector("input[name='lastName']").value = "";
             document.querySelector("input[name='firstName']").value = "";
             reload();
-        } else if(data.error == "one") {
+        } else if(data.error === "one") {
             result.innerText = "Une session employé est déjà enregistré sous ce nom.";
             result.style.color = "red";
         } else {
@@ -91,14 +91,14 @@ function researchUser(e) {
     }).then((response) => {
         return response.json();
     }).then((data) => {
-        if(data.success == "yes") {
+        if(data.success === "yes") {
             document.getElementById("about").style.display = "block";
             document.getElementById("id").innerText = data.id;
             const nomM = data.nom.toString().toUpperCase();
             document.getElementById("nom").innerText = nomM;
             document.getElementById("prenom").innerText = data.prenom;
             document.getElementById("pseudo").innerText = data.pseudo;
-            if (data.role == "ADMIN") {
+            if(data.role === "ADMIN") {
                 document.getElementById("role").innerText = "Gérant";
             } else {
                 document.getElementById("role").innerText = "Employé";
@@ -106,7 +106,7 @@ function researchUser(e) {
             }
             document.querySelector("input[name='name']").value = "";
             document.getElementById("urlEdit").href = data.urlEdit;
-            if (data.itsMe == "yes") {
+            if (data.itsMe === "yes") {
                 document.getElementById("btnDelete").setAttribute("disabled", "true");
             } else {
                 document.getElementById("btnDelete").removeAttribute("disabled");

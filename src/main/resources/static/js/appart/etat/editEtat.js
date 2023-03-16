@@ -9,7 +9,7 @@ window.addEventListener('load', function() {
         })
     }
 
-    loadHeader();
+    loadHeader().then(r => r);
 });
 
 
@@ -30,7 +30,7 @@ function editEtat(e) {
         if(data.nochange) {
             //
         } else {
-            if (data.success == "yes") {
+            if (data.success === "yes") {
                 result.innerText = "Les informations de l'état des lieux ont été modifier avec succès.";
                 result.style.color = "green";
                 setTimeout(function () {

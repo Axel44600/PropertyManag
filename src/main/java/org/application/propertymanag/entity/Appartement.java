@@ -102,6 +102,10 @@ public class Appartement {
         return dateCreation;
     }
 
+    public Integer getMontantFraisAgence() {
+        return montantFraisAgence;
+    }
+
     public void setMontantFraisAgence(Integer montantFraisAgence) {
         this.montantFraisAgence = montantFraisAgence;
     }

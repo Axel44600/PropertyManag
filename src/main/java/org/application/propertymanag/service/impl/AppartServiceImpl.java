@@ -70,6 +70,11 @@ public class AppartServiceImpl implements AppartService {
     }
 
     @Override
+    public EtatDesLieux getEtatByRef(String ref) {
+        return etatRepository.findByRef(ref);
+    }
+
+    @Override
     public List<EtatDesLieux> getListOfEtats() {
         return etatRepository.findAll();
     }
@@ -77,11 +82,6 @@ public class AppartServiceImpl implements AppartService {
     @Override
     public void createEtat(EtatDesLieux e) {
         etatRepository.save(e);
-    }
-
-    @Override
-    public EtatDesLieux getEtatByRef(String ref) {
-        return etatRepository.findByRef(ref);
     }
 
 

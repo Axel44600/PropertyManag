@@ -84,7 +84,7 @@ public class AppartValidator {
 
         String result;
 
-        if (appartService.getAppartByAdresse(adresse) == null) {
+        if(appartService.getAppartByAdresse(adresse) == null) {
             Integer montantFraisAgence = (montantLoyer * FRAIS_AGENCE) / 100;
 
             var appartement = Appartement.builder()

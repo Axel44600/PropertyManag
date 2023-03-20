@@ -104,8 +104,7 @@ public class AppartController implements PathConfig {
             @ApiResponse(responseCode = "405", description = "Cet appartement n'existe pas")
     })
     public String findApart(@Parameter(description = "Adresse de l'appartement") @RequestParam(name = "address") String value) {
-            boolean appartFound = appartService.getListOfApparts().stream().anyMatch(
-                    appartement -> appartement.getAdresse().equals(value));
+            boolean appartFound = appartService.getListOfApparts().stream().anyMatch(appartement -> appartement.getAdresse().equals(value));
 
             if (!appartFound) {
                 return "{" + "\"success\": \"no\"}";
@@ -166,7 +165,7 @@ public class AppartController implements PathConfig {
             @ApiResponse(responseCode = "403", description = "Opération interdite"),
             @ApiResponse(responseCode = "405", description = "Cet appartement n'existe pas")
     })
-    public void deleteUser(@Parameter(description = "ID de l'appartement") @RequestParam("idAppart") Integer idAppart, HttpServletResponse response) throws IOException {
+    public void deleteApart(@Parameter(description = "ID de l'appartement") @RequestParam("idAppart") Integer idAppart, HttpServletResponse response) throws IOException {
         if(idAppart != null) {
             Appartement a = appartService.getAppartById(idAppart);
             appartService.deleteAppart(a);

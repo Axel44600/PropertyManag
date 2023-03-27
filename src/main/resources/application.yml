@@ -21,9 +21,9 @@ spring:
       minimum-idle: 1
       maximum-pool-size: 10
       auto-commit: true
-    url: jdbc:postgresql://postgresql-pokemon.alwaysdata.net/pokemon_propertymanag
-    username: pokemon
-    password: Bushido44250.
+    url: ##
+    username: ##
+    password: ##
   jpa:
     hibernate:
       ddl-auto: update

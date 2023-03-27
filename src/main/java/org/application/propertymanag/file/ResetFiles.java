@@ -1,58 +1,40 @@
 package org.application.propertymanag.file;
 
+import com.google.auth.oauth2.ServiceAccountCredentials;
+import com.google.cloud.storage.Blob;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
-import java.io.File;
+
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.Objects;
+
+import static org.application.propertymanag.configuration.PathConfig.NAME_BUCKET;
+import static org.application.propertymanag.configuration.PathConfig.SERVICE_ACCOUNT_JSON_PATH;
 
 @Configuration
 @EnableScheduling
 public class ResetFiles {
 
-    private final String absolutePath = new File("pom.xml").getAbsolutePath();
-    private final String filePath = absolutePath.substring(0,absolutePath.lastIndexOf(File.separator));
-    private final String url = filePath+"\\pdf\\quittance";
-    private static final String dirName = "quittance";
+    private final Storage storage = StorageOptions.newBuilder().setCredentials(ServiceAccountCredentials.fromStream(new FileInputStream(SERVICE_ACCOUNT_JSON_PATH))).build().getService();
 
-    public static void delete(File f) throws IOException {
-        if(f.isDirectory()) {
-            if(Objects.requireNonNull(f.list()).length == 0){
-                System.out.println("Le dossier "+dirName+" a été supprimé : "+ f.getAbsolutePath());
-            } else {
-                String[] files = f.list();
-                assert files != null;
-                for (String tmp : files) {
-                    File file = new File(f, tmp);
-                    delete(file);
-                }
-                if(Objects.requireNonNull(f.list()).length == 0){
-                    f.delete();
-                    System.out.println("Le dossier "+dirName+" a été supprimé : "+ f.getAbsolutePath());
-                }
-            }
-        } else {
-            f.delete();
-            System.out.println("Les fichiers du dossier "+dirName+" ont été supprimés : " + f.getAbsolutePath());
-        }
+    public ResetFiles() throws IOException {
     }
 
-    // Remise à zéro du package tous les soirs à 22h
+    // Remise à zéro du stockage GCP tous les soirs à 22h
     @Scheduled(cron = "0 0 22 * * ?", zone = "Europe/Paris")
-    public void timerReset() throws IOException {
-        System.out.println("Remise à zéro quotidienne des fichiers PDF stockée enclenchée -> "+ LocalDateTime.now().getHour()+":"+LocalDateTime.now().getMinute());
+    public void timerReset() {
+        System.out.println("Remise à zéro quotidienne des fichiers PDF stockée sur le cloud -> "+ LocalDateTime.now().getHour()+":"+LocalDateTime.now().getMinute());
 
-        delete(new File(url+"\\"));
-        File dossier = new File(url);
-        boolean res = dossier.mkdir();
-            if(res) {
-                System.out.println("Le dossier "+dirName+" a été créé.");
+        Iterable<Blob> blobs = storage.list(NAME_BUCKET, Storage.BlobListOption.prefix("")).iterateAll();
+        if(blobs != null) {
+            for (Blob blob : blobs) {
+                blob.delete(Blob.BlobSourceOption.generationMatch());
             }
-            else {
-                System.out.println("Le dossier "+dirName+" existe déjà.");
-            }
+        }
     }
 
 }

@@ -1,14 +1,27 @@
 package org.application.propertymanag.file;
 
+import com.google.auth.oauth2.ServiceAccountCredentials;
+import com.google.cloud.storage.*;
 import com.itextpdf.text.*;
-import com.itextpdf.text.pdf.*;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
 import org.application.propertymanag.entity.Appartement;
-import java.io.IOException;
-import java.time.LocalDate;
 import org.application.propertymanag.entity.Locataire;
-import java.io.FileOutputStream;
+import org.application.propertymanag.entity.Loyer;
+
+import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.net.URL;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import static org.application.propertymanag.configuration.PathConfig.APP_NAME;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
+
+import static org.application.propertymanag.configuration.PathConfig.*;
 
 public class QuittancePDF {
 
@@ -18,28 +31,53 @@ public class QuittancePDF {
     private static final Font subFont = new Font(Font.FontFamily.HELVETICA, 16, Font.NORMAL);
     private static final Font smallBold = new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD);
     private static final Font small = new Font(Font.FontFamily.HELVETICA, 10, Font.NORMAL);
+    private final Storage storage = StorageOptions.newBuilder().setCredentials(ServiceAccountCredentials.fromStream(new FileInputStream(SERVICE_ACCOUNT_JSON_PATH))).build().getService();
 
-    public void createQuittance(Appartement appart, Locataire locataire, LocalDate dateDebut, LocalDate dateFin, String url) {
+    public QuittancePDF() throws IOException {
+    }
+
+    public String createQuittance(Appartement appart, Locataire locataire, LocalDate dateDebut, LocalDate dateFin, String nameFile, List<Loyer> selectLoyers) {
+        String urlFile = null;
             try {
+                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                 Document document = new Document();
-                PdfWriter.getInstance(document, new FileOutputStream(url));
+                PdfWriter.getInstance(document, byteArrayOutputStream);
                 document.open();
                 addMetaData(document);
-                addPage(document, appart, locataire, dateDebut, dateFin);
+                List<Double> listOfLoyers = new ArrayList<>();
+                for(Loyer l : selectLoyers) {
+                    Float loyer = Float.valueOf(l.getMontant());
+                    listOfLoyers.add(Double.valueOf(loyer));
+                }
+                addPage(document, appart, locataire, dateDebut, dateFin, listOfLoyers);
                 document.close();
+
+                byte[] bytes = byteArrayOutputStream.toByteArray();
+                BlobId blobId = BlobId.of(NAME_BUCKET, nameFile);
+                BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
+                storage.create(blobInfo, bytes);
+
+                URL url = storage.signUrl(blobInfo, 1, TimeUnit.HOURS,
+                        Storage.SignUrlOption.httpMethod(HttpMethod.GET),
+                        Storage.SignUrlOption.signWith(ServiceAccountCredentials.fromStream(new FileInputStream(SERVICE_ACCOUNT_JSON_PATH))));
+
+                urlFile = String.valueOf(url);
             } catch (Exception e) {
                 e.printStackTrace();
             }
+         return urlFile;
     }
 
     private static void addMetaData(Document document) {
             document.addTitle("Quittance de loyer");
-        }
+    }
 
-    private static void addPage(Document document, Appartement appart, Locataire locataire, LocalDate dateDebut, LocalDate dateFin) throws DocumentException, IOException {
+    private static void addPage(Document document, Appartement appart, Locataire locataire, LocalDate dateDebut, LocalDate dateFin, List<Double> listOfLoyers) throws DocumentException, IOException {
             Float loyer = Float.valueOf(appart.getMontantLoyer());
+            Double totalLoyer = listOfLoyers.stream().mapToDouble(Double::doubleValue).sum();
             Float charges = Float.valueOf(appart.getMontantCharges());
-            Float total = (float) (appart.getMontantLoyer() + appart.getMontantCharges());
+            Double totalCharges = (double) (appart.getMontantCharges() * listOfLoyers.size());
+            Double total = totalLoyer + totalCharges;
 
             Paragraph preface = new Paragraph();
                 preface.setAlignment(Element.ALIGN_CENTER);
@@ -220,7 +258,7 @@ public class QuittancePDF {
             Paragraph txt1 = new Paragraph();
             txt1.setAlignment(Element.ALIGN_RIGHT);
             addEmptyLine(txt1, 2);
-            Image image = Image.getInstance("C:\\Users\\Gaudin\\Projet_JAVA\\PropertyManag\\src\\main\\resources\\static\\img\\signature.png");
+            Image image = Image.getInstance(Objects.requireNonNull(QuittancePDF.class.getClassLoader().getResource("static/img/signature.png")));
             image.scaleToFit(150, 60);
             image.setAlignment(Element.ALIGN_RIGHT);
 

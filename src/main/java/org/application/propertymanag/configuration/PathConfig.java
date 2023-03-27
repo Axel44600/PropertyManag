@@ -3,9 +3,13 @@ package org.application.propertymanag.configuration;
 public interface PathConfig {
 
     String APP_NAME = "PropertyManag";
-    String PATH = "http://localhost";
     String APP_PATH = "/app";
-    String ADMIN_PATH = "app/admin";
     Integer FRAIS_AGENCE = 8;
+
+    // GCP
+    String NAME_BUCKET = "property-manag";
+    String SERVICE_ACCOUNT_JSON_PATH = System.getProperty("user.dir")+"/target/classes/gcp-account-file.json";
+
+
 
 }

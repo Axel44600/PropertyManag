@@ -52,7 +52,7 @@ public class LocataireController implements PathConfig {
     public String getHome(Authentication authentication, Model model) {
         model.addAttribute("appName", APP_NAME);
         model.addAttribute("userFirstName", adminService.getUserByPseudo(authentication.getName()).getPrenom());
-        return "/app/loc/home";
+        return "app/loc/home";
     }
 
     @GetMapping("/data/listOfLocs")
@@ -64,7 +64,7 @@ public class LocataireController implements PathConfig {
     })
     public String getListOfLocataires(Model model) {
         model.addAttribute("listOfLocataires", locataireService.getListOfLocataires());
-        return "/app/loc/data/list_locataires";
+        return "app/loc/data/list_locataires";
     }
 
     @GetMapping("/editLocataire/{lastName}")
@@ -78,7 +78,7 @@ public class LocataireController implements PathConfig {
          model.addAttribute("locataire", locataireService.getLocataireByNom(nom));
          model.addAttribute("appName", APP_NAME);
          model.addAttribute("pseudo", authentication.getName());
-         return "/app/loc/edit_locataire";
+         return "app/loc/edit_locataire";
     }
 
     @PostMapping(value = "/researchLoc", produces = MediaType.APPLICATION_JSON_VALUE)

@@ -52,7 +52,7 @@ public class AdminController implements PathConfig {
     public String getHome(Model model, Authentication auth) {
         model.addAttribute("appName", APP_NAME);
         model.addAttribute("user", adminService.getUserByPseudo(auth.getName()));
-        return "/app/admin/home";
+        return "app/admin/home";
     }
 
     @GetMapping("/data/listOfUsers")
@@ -65,7 +65,7 @@ public class AdminController implements PathConfig {
     public String getListOfUsers(Model model, Authentication auth) {
         model.addAttribute("listOfUsers", adminService.getListOfUsers());
         model.addAttribute("user", adminService.getUserByPseudo(auth.getName()));
-        return "/app/admin/data/list_users";
+        return "app/admin/data/list_users";
     }
 
     @GetMapping("/editUser/{id}")
@@ -83,10 +83,10 @@ public class AdminController implements PathConfig {
 
             model.addAttribute("listOfUsers", listOfUsers);
             model.addAttribute("appName", APP_NAME);
-            return "/app/admin/edit_user";
+            return "app/admin/edit_user";
         } catch (NoSuchElementException nSE) {
             response.sendRedirect("/app/home");
-            return "/app/admin/home";
+            return "app/admin/home";
         }
     }
 

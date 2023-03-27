@@ -43,7 +43,7 @@ public class GarantieController implements PathConfig {
                 garantie -> garantie.getIdAppart().getIdAppart().equals(idAppart)).toList();
 
         model.addAttribute("listOfDepots", listOfDepots);
-        return "/app/appart/garantie/home";
+        return "app/appart/garantie/home";
     }
 
     @PostMapping(value = "/validDepot")
@@ -59,7 +59,7 @@ public class GarantieController implements PathConfig {
             DepotDeGarantie d = appartService.getDepotById(idDepot);
             d.setStatut(true);
             appartService.createDepot(d);
-            response.sendRedirect("/app/appart/depotGarantie/"+d.getIdAppart().getIdAppart());
+            response.sendRedirect("app/appart/depotGarantie/"+d.getIdAppart().getIdAppart());
         }
     }
 

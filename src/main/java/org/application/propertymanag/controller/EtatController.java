@@ -49,7 +49,7 @@ public class EtatController implements PathConfig {
         model.addAttribute("appName", APP_NAME);
         List<EtatDesLieux> listOfEtats = appartService.getListOfEtats().stream().filter(etatDesLieux -> etatDesLieux.getIdAppart().getIdAppart().equals(idAppart)).toList();
         model.addAttribute("listOfEtats", listOfEtats);
-        return "/app/appart/etat/home";
+        return "app/appart/etat/home";
     }
 
     @GetMapping("/editEtat/{idEtat}")
@@ -64,11 +64,11 @@ public class EtatController implements PathConfig {
             EtatDesLieux etat = appartService.getEtatById(idEtat);
             model.addAttribute("etat", etat);
             model.addAttribute("appName", APP_NAME);
-            return "/app/appart/etat/edit_etat";
+            return "app/appart/etat/edit_etat";
 
         } catch (NoSuchElementException nSE) {
             response.sendRedirect("/app/home");
-            return "/app/appart/etat/home";
+            return "app/appart/etat/home";
         }
     }
 

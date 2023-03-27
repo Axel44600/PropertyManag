@@ -51,7 +51,7 @@ public class AppartController implements PathConfig {
     public String getHome(Model model) {
         model.addAttribute("appName", APP_NAME);
         model.addAttribute("listOfApparts", appartService.getListOfApparts());
-        return "/app/appart/home";
+        return "app/appart/home";
     }
 
     @GetMapping("/data/listOfApparts")
@@ -63,7 +63,7 @@ public class AppartController implements PathConfig {
     })
     public String getListOfApparts(Model model) {
         model.addAttribute("listOfApparts", appartService.getListOfApparts());
-        return "/app/appart/data/list_apparts";
+        return "app/appart/data/list_apparts";
     }
 
     @GetMapping("/editAppart/{idAppart}")
@@ -87,10 +87,10 @@ public class AppartController implements PathConfig {
             }
             model.addAttribute("listOfLocataires", listOfLocataires);
             model.addAttribute("appName", APP_NAME);
-            return "/app/appart/edit_appart";
+            return "app/appart/edit_appart";
         } catch (NoSuchElementException nSE) {
             response.sendRedirect("/app/home");
-            return "/app/loc/home";
+            return "app/loc/home";
         }
     }
 

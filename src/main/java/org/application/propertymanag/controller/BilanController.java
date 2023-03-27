@@ -44,6 +44,6 @@ public class BilanController implements PathConfig {
         Locataire locataire = locataireService.getLocataireByNom(lastName);
         model.addAttribute("listOfBilans", listOfBilans);
         model.addAttribute("locataire", locataire);
-        return "/app/loc/bilan/home";
+        return "app/loc/bilan/home";
     }
 }

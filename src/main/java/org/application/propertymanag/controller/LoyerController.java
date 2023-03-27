@@ -62,7 +62,7 @@ public class LoyerController implements PathConfig {
         model.addAttribute("appart", a);
         model.addAttribute("listOfLoyers", listOfLoyers);
         model.addAttribute("listOfLoyersPayed", listOfLoyersPayed);
-        return "/app/appart/loyer/home";
+        return "app/appart/loyer/home";
     }
 
     @GetMapping("/data/listOfLoyers/{idAppart}")
@@ -75,7 +75,7 @@ public class LoyerController implements PathConfig {
     public String getListOfLoyers(@Parameter(description = "ID de l'appartement") @PathVariable(value = "idAppart") Integer idAppart, Model model) {
         List<Loyer> listOfLoyers = appartService.getListOfLoyers().stream().filter(loyer -> loyer.getIdAppart().getIdAppart().equals(idAppart)).toList();
         model.addAttribute("listOfLoyers", listOfLoyers);
-        return "/app/appart/loyer/data/list_loyers";
+        return "app/appart/loyer/data/list_loyers";
     }
 
     @GetMapping("/editLoyer/{idLoyer}")
@@ -91,10 +91,10 @@ public class LoyerController implements PathConfig {
             model.addAttribute("loyer", l);
             model.addAttribute("appart", appartService.getAppartById(l.getIdAppart().getIdAppart()));
             model.addAttribute("appName", APP_NAME);
-            return "/app/appart/loyer/edit_loyer";
+            return "app/appart/loyer/edit_loyer";
         } else {
             response.sendRedirect("/app/appart/loyer/home");
-            return "/app/appart/loyer/home";
+            return "app/appart/loyer/home";
         }
     }
 
@@ -200,7 +200,7 @@ public class LoyerController implements PathConfig {
     })
     public String createQuittance(@Parameter(description = "ID de l'appartement") @RequestParam(name = "idAppart") Integer idAppart,
                                   @Parameter(description = "Date du premier loyer") @RequestParam(name = "dateD") LocalDate dateD,
-                                  @Parameter(description = "Date du dernier loyer") @RequestParam(name = "dateF") LocalDate dateF) {
+                                  @Parameter(description = "Date du dernier loyer") @RequestParam(name = "dateF") LocalDate dateF) throws IOException {
 
         if(idAppart != null && dateD != null && dateF != null) {
             return validator.createQuittance(appartService, locataireService, mainService, idAppart, dateD, dateF);

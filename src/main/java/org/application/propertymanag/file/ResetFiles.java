@@ -24,7 +24,7 @@ public class ResetFiles {
     public ResetFiles() throws IOException {
     }
 
-    // Remise à zéro du stockage GCP tous les soirs à 22h
+    // RESET du stockage GCP tous les soirs à 22h
     @Scheduled(cron = "0 0 22 * * ?", zone = "Europe/Paris")
     public void timerReset() {
         System.out.println("Remise à zéro quotidienne des fichiers PDF stockée sur le cloud -> "+ LocalDateTime.now().getHour()+":"+LocalDateTime.now().getMinute());

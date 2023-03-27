@@ -10,6 +10,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
@@ -22,7 +23,7 @@ class MainControllerTest {
 
     @Test
     void testGetIndex() throws Exception {
-        mockMvc.perform(get("/")).andExpect(status().isOk());
+        mockMvc.perform(get("/")).andExpect(redirectedUrl("/auth"));
     }
 
     @WithMockUser(authorities = {"EMPLOYE", "ADMIN"})

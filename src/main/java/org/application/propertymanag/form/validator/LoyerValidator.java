@@ -1,6 +1,5 @@
 package org.application.propertymanag.form.validator;
 
-import org.application.propertymanag.configuration.PathConfig;
 import org.application.propertymanag.entity.Appartement;
 import org.application.propertymanag.entity.Locataire;
 import org.application.propertymanag.entity.Loyer;
@@ -9,7 +8,8 @@ import org.application.propertymanag.form.appart.loyer.LoyerForm;
 import org.application.propertymanag.service.impl.AppartServiceImpl;
 import org.application.propertymanag.service.impl.LocataireServiceImpl;
 import org.application.propertymanag.service.impl.MainServiceImpl;
-import java.io.File;
+
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class LoyerValidator {
+
 
     // Créer un loyer
     public String createLoyer(AppartServiceImpl appartService, MainServiceImpl mainService, LocataireServiceImpl locataireService, LoyerForm form) {
@@ -118,7 +119,7 @@ public class LoyerValidator {
     }
 
     // Créer une quittance de loyer
-    public String createQuittance(AppartServiceImpl appartService, LocataireServiceImpl locataireService, MainServiceImpl mainService, Integer idAppart, LocalDate dateD, LocalDate dateF) {
+    public String createQuittance(AppartServiceImpl appartService, LocataireServiceImpl locataireService, MainServiceImpl mainService, Integer idAppart, LocalDate dateD, LocalDate dateF) throws IOException {
         Appartement appart = appartService.getAppartById(idAppart);
         Locataire loc = locataireService.getLocataireById(appart.getIdLoc().getIdLoc());
         List<Loyer> listOfLoyers = appartService.getListOfLoyers().stream().filter(loyer -> loyer.getIdAppart().getIdAppart().equals(idAppart)).toList();
@@ -131,12 +132,7 @@ public class LoyerValidator {
             }
         }
 
-        String absolutePath = new File("pom.xml").getAbsolutePath();
-        String filePath = absolutePath.substring(0,absolutePath.lastIndexOf(File.separator));
-        String titleFile = loc.getNom().toUpperCase()+"_"+loc.getPrenom()+"_Quittance_de_loyer_APPART_N°"+idAppart+"_"+mainService.getRandomStr(8)+".pdf";
-        String url = filePath+"\\pdf\\quittance\\"+titleFile;
-        String urlWeb = PathConfig.PATH+"/pdf/quittance/"+titleFile;
-
+        String nameFile = loc.getNom().toUpperCase()+"_"+loc.getPrenom()+"_Quittance_de_loyer_APPART_N"+idAppart+"_"+mainService.getRandomStr(8)+".pdf";
         List<LocalDate> listOfDates = new ArrayList<>();
         for(Loyer l : selectLoyers) {
             listOfDates.add(l.getDate());
@@ -145,7 +141,7 @@ public class LoyerValidator {
         LocalDate dateFin = Collections.max(listOfDates);
 
         QuittancePDF pdf = new QuittancePDF();
-        pdf.createQuittance(appart, loc, dateDebut, dateFin, url);
+        String urlWeb = pdf.createQuittance(appart, loc, dateDebut, dateFin, nameFile, selectLoyers);
         return "{\"success\": \"yes\"," +
                 "\"urlWeb\": \"" + urlWeb + "\"}";
     }

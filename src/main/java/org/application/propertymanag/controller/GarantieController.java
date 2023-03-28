@@ -59,7 +59,7 @@ public class GarantieController implements PathConfig {
             DepotDeGarantie d = appartService.getDepotById(idDepot);
             d.setStatut(true);
             appartService.createDepot(d);
-            response.sendRedirect("app/appart/depotGarantie/"+d.getIdAppart().getIdAppart());
+            response.sendRedirect(URL_PATH+"/app/appart/depotGarantie/"+d.getIdAppart().getIdAppart());
         }
     }
 

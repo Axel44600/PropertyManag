@@ -75,16 +75,16 @@ function createLoyer(e) {
         if(data.nochange) {
             //
         } else {
-            if (data.success == "yes") {
-                result.innerText = "L'appartement a été ajouter avec succès.";
+            if (data.success === "yes") {
+                result.innerText = "Le loyer a été ajouté avec succès.";
                 result.style.color = "green";
                 reload();
                 setTimeout(function() { result.innerText = ""; }, 5000);
                 document.querySelector("input[name='date']").value = "";
-            } else if (data.error == "one") {
+            } else if (data.error === "one") {
                 result.innerText = "Un loyer a déjà été enregistrer pour ce mois.";
                 result.style.color = "red";
-            } else if (data.error == "two") {
+            } else if (data.error === "two") {
                 result.innerText = "La date du loyer ne peut pas être plus ancienne que l'appartement";
                 result.style.color = "red";
             } else {
@@ -112,8 +112,8 @@ function researchLoyer(e) {
     }).then((response) => {
         return response.json();
     }).then((data) => {
-        if(data.success == "yes") {
-            if(data.statut == "paid") {
+        if(data.success === "yes") {
+            if(data.statut === "paid") {
                 document.getElementById("lStatut").innerText = "Payé";
                 document.getElementById("trLoyer").style.backgroundColor = "#4caf50";
                 document.getElementById("trLoyer").style.color = "#fff";
@@ -152,7 +152,7 @@ function createQuittance(e) {
     }).then((response) => {
         return response.json();
     }).then((data) => {
-        if(data.success == "yes") {
+        if(data.success === "yes") {
             result.style.display = "block";
             result.querySelector("p").innerText = "La quittance de loyer a été générer avec succès.";
             result.querySelector("p").style.color = "green";

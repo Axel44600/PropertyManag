@@ -1,8 +1,10 @@
 package org.application.propertymanag.service;
 
+import org.application.propertymanag.entity.Agence;
 import org.application.propertymanag.entity.Users;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface AdminService {
 
@@ -17,6 +19,10 @@ public interface AdminService {
     void createUser(Users e);
 
     void deleteUser(Users u);
+
+    Optional<Agence> getAgencyById(Integer idAgency);
+
+    void updateAgency(Agence agence);
 
     String getRandomStr(int n);
 

@@ -5,7 +5,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
-import org.application.propertymanag.configuration.PathConfig;
+import org.application.propertymanag.service.impl.AppartServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,7 +17,23 @@ import java.io.IOException;
 
 @Controller
 @Tag(name = "Application")
-public class MainController implements PathConfig {
+public class MainController {
+
+    @Value("${config.application.name}")
+    public String APP_NAME;
+
+    @Value("${config.application.path}")
+    public String APP_PATH;
+
+    @Value("${config.agence.id}")
+    public Integer AGENCY_ID;
+
+    private AppartServiceImpl appartService;
+
+    @Autowired
+    public void setInjectedBean(AppartServiceImpl appartService) {
+        this.appartService = appartService;
+    }
 
     @GetMapping("/")
     @Operation(summary = "Page d'accueil")
@@ -44,6 +62,7 @@ public class MainController implements PathConfig {
             String role = authentication.getAuthorities().toString();
             model.addAttribute("role", role.substring(1, role.length()-1));
             model.addAttribute("appName", APP_NAME);
+            model.addAttribute("agencyName", appartService.getNameAgency(AGENCY_ID));
             return "app/header";
     }
 

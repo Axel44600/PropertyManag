@@ -5,12 +5,12 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.application.propertymanag.configuration.PathConfig;
 import org.application.propertymanag.entity.Bilan;
 import org.application.propertymanag.entity.Locataire;
 import org.application.propertymanag.service.impl.AppartServiceImpl;
 import org.application.propertymanag.service.impl.LocataireServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -20,10 +20,13 @@ import java.util.List;
 @Controller
 @Tag(name = "Bilan des comptes des loyers")
 @RequestMapping("/app/bilan")
-public class BilanController implements PathConfig {
+public class BilanController {
 
     private AppartServiceImpl appartService;
     private LocataireServiceImpl locataireService;
+
+    @Value("${config.application.name}")
+    public String APP_NAME;
 
     @Autowired
     public void setInjectedBean(AppartServiceImpl appartService, LocataireServiceImpl locataireService) {

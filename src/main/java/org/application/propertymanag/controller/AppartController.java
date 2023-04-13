@@ -7,13 +7,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import org.application.propertymanag.configuration.PathConfig;
 import org.application.propertymanag.entity.*;
 import org.application.propertymanag.form.appart.CreateAppartForm;
 import org.application.propertymanag.form.appart.UpdateAppartForm;
 import org.application.propertymanag.form.validator.AppartValidator;
 import org.application.propertymanag.service.impl.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
@@ -27,12 +27,15 @@ import java.util.*;
 @Controller
 @Tag(name = "Appartement")
 @RequestMapping("/app")
-public class AppartController implements PathConfig {
+public class AppartController {
 
     private AppartServiceImpl appartService;
     private LocataireServiceImpl locataireService;
     private MainServiceImpl mainService;
     private final AppartValidator validator = new AppartValidator();
+
+    @Value("${config.application.name}")
+    public String APP_NAME;
 
     @Autowired
     public void setInjectedBean(AppartServiceImpl appartService, LocataireServiceImpl locataireService, MainServiceImpl mainService) {

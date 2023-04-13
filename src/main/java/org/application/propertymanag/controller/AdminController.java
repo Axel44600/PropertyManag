@@ -7,13 +7,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import org.application.propertymanag.configuration.PathConfig;
 import org.application.propertymanag.entity.*;
 import org.application.propertymanag.form.admin.CreateUserForm;
 import org.application.propertymanag.form.admin.UpdateUserForm;
 import org.application.propertymanag.form.validator.AdminValidator;
 import org.application.propertymanag.service.impl.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.Authentication;
@@ -30,11 +30,17 @@ import java.util.Objects;
 @Controller
 @Tag(name = "Administration")
 @RequestMapping("/app/admin")
-public class AdminController implements PathConfig {
+public class AdminController {
 
     private AdminServiceImpl adminService;
     private MainServiceImpl mainService;
     private final AdminValidator validator = new AdminValidator();
+
+    @Value("${config.application.name}")
+    public String APP_NAME;
+
+    @Value("${config.agence.id}")
+    public Integer AGENCY_ID;
 
     @Autowired
     public void setInjectedBean(AdminServiceImpl adminService, MainServiceImpl mainService) {
@@ -52,6 +58,9 @@ public class AdminController implements PathConfig {
     public String getHome(Model model, Authentication auth) {
         model.addAttribute("appName", APP_NAME);
         model.addAttribute("user", adminService.getUserByPseudo(auth.getName()));
+        Agence agence = adminService.getAgencyById(AGENCY_ID).orElseThrow();
+            model.addAttribute("nameAgency", agence.getNomAgence());
+            model.addAttribute("expensesAgency", agence.getFraisAgence());
         return "app/admin/home";
     }
 
@@ -172,5 +181,38 @@ public class AdminController implements PathConfig {
             adminService.deleteUser(user);
             response.sendRedirect("/app/admin/home");
         }
+    }
+
+    @PostMapping(value = "/editAgency", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    @Secured("ADMIN")
+    @Operation(summary = "Modifier les informations de l'agence")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Modification des informations de l'agence"),
+            @ApiResponse(responseCode = "403", description = "Opération interdite"),
+            @ApiResponse(responseCode = "405", description = "L'une des informations saisies est incorrecte")
+    })
+    public String editAgency(@RequestParam("nameAgency") String nameAgency, @RequestParam("expensesAgency") Integer expensesAgency) {
+        String result;
+        Agence agence = adminService.getAgencyById(AGENCY_ID).orElseThrow();
+        if(!nameAgency.isEmpty() && expensesAgency != null) {
+            if(!nameAgency.equals(agence.getNomAgence()) || !expensesAgency.equals(agence.getFraisAgence())) {
+                if(expensesAgency >= 0) {
+                    agence.setNomAgence(nameAgency);
+                    agence.setFraisAgence(expensesAgency);
+                    adminService.updateAgency(agence);
+                    result = "{" + "\"success\": \"yes\"}";
+                } else {
+                    // Les frais d'agence ne peuvent pas être négatifs.
+                    result = "{" + "\"error\": \"one\"}";
+                }
+            } else {
+                result = "{" + "\"nochange\": \"yes\"}";
+            }
+        } else {
+            // Veuillez saisir tous les champs du formulaire.
+            result = "{" + "\"error\": \"two\"}";
+        }
+        return result;
     }
 }

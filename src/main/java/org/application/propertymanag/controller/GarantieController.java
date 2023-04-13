@@ -6,10 +6,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
-import org.application.propertymanag.configuration.PathConfig;
 import org.application.propertymanag.entity.DepotDeGarantie;
 import org.application.propertymanag.service.impl.AppartServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,9 +21,15 @@ import java.util.List;
 @Controller
 @Tag(name = "Dépôt de garantie")
 @RequestMapping("/app/appart/depotGarantie")
-public class GarantieController implements PathConfig {
+public class GarantieController {
 
     private AppartServiceImpl appartService;
+
+    @Value("${config.application.name}")
+    public String APP_NAME;
+
+    @Value("${config.application.url}")
+    public String APP_URL;
 
     @Autowired
     public void setInjectedBean(AppartServiceImpl appartService) {
@@ -59,7 +65,7 @@ public class GarantieController implements PathConfig {
             DepotDeGarantie d = appartService.getDepotById(idDepot);
             d.setStatut(true);
             appartService.createDepot(d);
-            response.sendRedirect(URL_PATH+"/app/appart/depotGarantie/"+d.getIdAppart().getIdAppart());
+            response.sendRedirect(APP_URL+"/app/appart/depotGarantie/"+d.getIdAppart().getIdAppart());
         }
     }
 

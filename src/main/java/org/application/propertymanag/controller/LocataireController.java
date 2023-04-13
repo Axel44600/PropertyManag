@@ -6,7 +6,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.application.propertymanag.configuration.PathConfig;
 import org.application.propertymanag.entity.Locataire;
 import org.application.propertymanag.form.locataire.CreateLocForm;
 import org.application.propertymanag.form.locataire.UpdateLocForm;
@@ -15,6 +14,7 @@ import org.application.propertymanag.service.impl.AdminServiceImpl;
 import org.application.propertymanag.service.impl.LocataireServiceImpl;
 import org.application.propertymanag.service.impl.MainServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.Authentication;
@@ -28,12 +28,15 @@ import java.util.Objects;
 @Controller
 @Tag(name = "Locataire")
 @RequestMapping("/app")
-public class LocataireController implements PathConfig {
+public class LocataireController {
 
     private AdminServiceImpl adminService;
     private LocataireServiceImpl locataireService;
     private MainServiceImpl mainService;
     private final LocataireValidator validator = new LocataireValidator();
+
+    @Value("${config.application.name}")
+    public String APP_NAME;
 
     @Autowired
     public void setInjectedBean(AdminServiceImpl adminService, LocataireServiceImpl locataireService, MainServiceImpl mainService) {

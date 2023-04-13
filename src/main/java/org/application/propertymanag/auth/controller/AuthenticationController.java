@@ -10,8 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.application.propertymanag.auth.form.FirstAuthForm;
 import org.application.propertymanag.auth.form.FirstAuthValidator;
 import org.application.propertymanag.auth.service.AuthenticationService;
-import org.application.propertymanag.configuration.PathConfig;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -25,10 +25,13 @@ import java.util.Objects;
 @Controller
 @Tag(name = "Authentification")
 @RequiredArgsConstructor
-public class AuthenticationController implements PathConfig {
+public class AuthenticationController {
 
     private AuthenticationService service;
     private final FirstAuthValidator validator = new FirstAuthValidator();
+
+    @Value("${config.application.name}")
+    public String APP_NAME;
 
     @Autowired
     public void setInjectedBean(AuthenticationService service) {

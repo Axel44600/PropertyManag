@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import org.application.propertymanag.configuration.PathConfig;
 import org.application.propertymanag.entity.Appartement;
 import org.application.propertymanag.entity.Locataire;
 import org.application.propertymanag.entity.Loyer;
@@ -15,6 +14,7 @@ import org.application.propertymanag.form.appart.loyer.LoyerForm;
 import org.application.propertymanag.form.validator.LoyerValidator;
 import org.application.propertymanag.service.impl.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
@@ -30,12 +30,15 @@ import java.util.Objects;
 @Controller
 @Tag(name = "Loyer")
 @RequestMapping("/app/appart/loyer")
-public class LoyerController implements PathConfig {
+public class LoyerController {
 
     private AppartServiceImpl appartService;
     private MainServiceImpl mainService;
     private LocataireServiceImpl locataireService;
     private final LoyerValidator validator = new LoyerValidator();
+
+    @Value("${config.application.name}")
+    public String APP_NAME;
 
     @Autowired
     public void setInjectedBean(AppartServiceImpl appartService, MainServiceImpl mainService, LocataireServiceImpl locataireService) {

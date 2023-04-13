@@ -7,12 +7,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import org.application.propertymanag.configuration.PathConfig;
 import org.application.propertymanag.entity.EtatDesLieux;
 import org.application.propertymanag.form.appart.etat.UpdateEtatForm;
 import org.application.propertymanag.form.validator.EtatValidator;
 import org.application.propertymanag.service.impl.AppartServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
@@ -28,10 +28,13 @@ import java.util.Objects;
 @Controller
 @Tag(name = "État des lieux")
 @RequestMapping("/app/appart/etat")
-public class EtatController implements PathConfig {
+public class EtatController {
 
     private AppartServiceImpl appartService;
     private final EtatValidator validator = new EtatValidator();
+
+    @Value("${config.application.name}")
+    public String APP_NAME;
 
     @Autowired
     public void setInjectedBean(AppartServiceImpl appartService) {

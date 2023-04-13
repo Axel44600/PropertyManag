@@ -1,5 +1,6 @@
 package org.application.propertymanag.controller;
 
+import org.application.propertymanag.entity.Agence;
 import org.application.propertymanag.entity.Role;
 import org.application.propertymanag.entity.Users;
 import org.application.propertymanag.service.impl.AdminServiceImpl;
@@ -18,7 +19,9 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -37,6 +40,8 @@ class AdminControllerTest {
 
     private Users user;
 
+    private Agence agence;
+
     @BeforeEach
     public void init() {
         user = Users.builder()
@@ -48,10 +53,17 @@ class AdminControllerTest {
                 .registerKey(null)
                 .role(Role.EMPLOYE)
                 .build();
+
+        agence = Agence.builder()
+                .idAgence(1)
+                .nomAgence("Infeco")
+                .fraisAgence(8)
+                .build();
     }
 
     @Test
     void testGetHome() throws Exception {
+        given(adminService.getAgencyById(1)).willReturn(Optional.ofNullable(agence));
         mockMvc.perform(MockMvcRequestBuilders.get("/app/admin/home")).andExpect(status().isOk());
     }
 
@@ -126,6 +138,20 @@ class AdminControllerTest {
         when(adminService.getUserById(user.getId())).thenReturn(user);
         mockMvc.perform(delete("/app/admin/deleteUser").param("id", String.valueOf(user.getId())))
                 .andExpect(redirectedUrl("/app/admin/home"));
+    }
+
+    @Test
+    void testEditAgency() throws Exception {
+        String nomAgence = "newAgency";
+        Integer fraisAgence = agence.getFraisAgence();
+
+        when(adminService.getAgencyById(agence.getIdAgence())).thenReturn(Optional.ofNullable(agence));
+        mockMvc.perform(post("/app/admin/editAgency")
+                        .param("nameAgency", nomAgence)
+                        .param("expensesAgency", String.valueOf(fraisAgence)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.*", Matchers.hasSize(1)))
+                .andExpect(jsonPath("$.success").value("yes"));
     }
 
 }

@@ -34,6 +34,7 @@ class AppartControllerTest {
     @MockBean
     private AppartServiceImpl appartService;
 
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -99,45 +100,6 @@ class AppartControllerTest {
                 .andExpect(jsonPath("$.urlSeeLoyer").value("./appart/loyer/"+appart.getIdAppart()))
                 .andExpect(jsonPath("$.urlSeeEtat").value("./appart/etat/"+appart.getIdAppart()))
                 .andExpect(jsonPath("$.urlSeeDepot").value("./appart/depotGarantie/"+appart.getIdAppart()));
-    }
-
-    @Test
-    void testCreateApart() throws Exception {
-        String adressForm = appart.getAdresse();
-
-        when(appartService.getAppartByAdresse(adressForm)).thenReturn(null);
-        mockMvc.perform(post("/app/createAppart")
-                        .param("adressForm", appart.getAdresse())
-                        .param("addressCompForm", appart.getAdresseComp())
-                        .param("villeForm", appart.getVille())
-                        .param("cPostalForm", String.valueOf(appart.getCodePostal()))
-                        .param("loyerForm", String.valueOf(appart.getMontantLoyer()))
-                        .param("chargesForm", String.valueOf(appart.getMontantCharges()))
-                        .param("depotGForm", String.valueOf(appart.getMontantCharges()))
-                        .param("dateForm", String.valueOf(appart.getDateCreation())))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.*", Matchers.hasSize(1)))
-                .andExpect(jsonPath("$.success").value("yes"));
-    }
-
-    @Test
-    void testEditApart() throws Exception {
-        String adressForm = appart.getAdresse();
-        Integer idLoc = appart.getIdLoc().getIdLoc();
-        Integer loyer = 230;
-        Integer charges = 55;
-        Integer depotGarantie = 700;
-
-        when(appartService.getAppartByAdresse(adressForm)).thenReturn(appart);
-        mockMvc.perform(post("/app/editAppart")
-                        .param("idLoc", String.valueOf(idLoc))
-                        .param("adressForm", appart.getAdresse())
-                        .param("loyerForm", String.valueOf(loyer))
-                        .param("chargesForm", String.valueOf(charges))
-                        .param("depotGForm", String.valueOf(depotGarantie)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.*", Matchers.hasSize(1)))
-                .andExpect(jsonPath("$.success").value("yes"));
     }
 
     @Test

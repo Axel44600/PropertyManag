@@ -9,7 +9,6 @@ import org.application.propertymanag.service.impl.AppartServiceImpl;
 import org.application.propertymanag.service.impl.LocataireServiceImpl;
 import org.application.propertymanag.service.impl.MainServiceImpl;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -119,7 +118,7 @@ public class LoyerValidator {
     }
 
     // Créer une quittance de loyer
-    public String createQuittance(AppartServiceImpl appartService, LocataireServiceImpl locataireService, MainServiceImpl mainService, Integer idAppart, LocalDate dateD, LocalDate dateF) throws IOException {
+    public String createQuittance(AppartServiceImpl appartService, LocataireServiceImpl locataireService, MainServiceImpl mainService, Integer idAppart, LocalDate dateD, LocalDate dateF) {
         Appartement appart = appartService.getAppartById(idAppart);
         Locataire loc = locataireService.getLocataireById(appart.getIdLoc().getIdLoc());
         List<Loyer> listOfLoyers = appartService.getListOfLoyers().stream().filter(loyer -> loyer.getIdAppart().getIdAppart().equals(idAppart)).toList();
@@ -141,7 +140,7 @@ public class LoyerValidator {
         LocalDate dateFin = Collections.max(listOfDates);
 
         QuittancePDF pdf = new QuittancePDF();
-        String urlWeb = pdf.createQuittance(appart, loc, dateDebut, dateFin, nameFile, selectLoyers);
+        String urlWeb = pdf.createQuittance(appartService, appart, loc, dateDebut, dateFin, nameFile, selectLoyers);
         return "{\"success\": \"yes\"," +
                 "\"urlWeb\": \"" + urlWeb + "\"}";
     }

@@ -4,11 +4,10 @@ import org.application.propertymanag.entity.*;
 import org.application.propertymanag.form.appart.CreateAppartForm;
 import org.application.propertymanag.form.appart.UpdateAppartForm;
 import org.application.propertymanag.service.impl.*;
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
-
-import static org.application.propertymanag.configuration.PathConfig.FRAIS_AGENCE;
 
 public class AppartValidator {
 
@@ -73,6 +72,7 @@ public class AppartValidator {
 
     // Créer un appartement
     public final String createAppart(AppartServiceImpl appartService, CreateAppartForm form) {
+
         String adresse = form.getAdressForm();
         String adresseComp = form.getAdressCompForm();
         String ville = form.getVilleForm();
@@ -85,7 +85,7 @@ public class AppartValidator {
         String result;
 
         if(appartService.getAppartByAdresse(adresse) == null) {
-            Integer montantFraisAgence = (montantLoyer * FRAIS_AGENCE) / 100;
+            Integer montantFraisAgence = (montantLoyer * appartService.getExpensesAgency(1)) / 100;
 
             var appartement = Appartement.builder()
                     .idAppart(null)
@@ -111,6 +111,7 @@ public class AppartValidator {
 
     // Modifier un appartement
     public final String editAppart(AppartServiceImpl appartService, LocataireServiceImpl locataireService, MainServiceImpl mainService, UpdateAppartForm form) {
+
         String result;
         String adresse = form.getAdressForm();
         Integer idLoc = form.getIdLoc();
@@ -138,7 +139,7 @@ public class AppartValidator {
         if (valueBool[0] || !loyer.equals(a.getMontantLoyer()) || !charges.equals(a.getMontantCharges()) || !depotGarantie.equals(a.getMontantDepotGarantie())) {
             if(a.getIdLoc() == null || a.getIdLoc().getSolde() >= 0) {
 
-            Integer montantFraisAgence = (loyer * FRAIS_AGENCE) / 100;
+            Integer montantFraisAgence = (loyer * appartService.getExpensesAgency(1)) / 100;
             if ((idLoc != null)) {
                 if (a.getIdLoc() != null && (valueBool[2])) { // DEMENAGEMENT
                         valueStr[1] = addRef(mainService, a, false);

@@ -73,3 +73,12 @@ CREATE TABLE users (
                               role character varying(50),
                               register_key character varying(255)
 );
+
+CREATE TABLE agence (
+                       id_agence integer NOT NULL PRIMARY KEY ,
+                       nom_agence character varying(50) NOT NULL,
+                       frais_agence integer NOT NULL
+);
+
+INSERT INTO agence(id_agence, nom_agence, frais_agence) VALUES (1, 'Infeco', 8);
+

@@ -8,14 +8,14 @@ public class MainServiceImpl implements MainService {
 
     @Override
     public String maj(String value) {
-        String varM = null;
+        StringBuilder varM = null;
 
         for (int i = 0; i < value.length(); i++) {
-            if (i == 0) { varM = Character.toString(value.toUpperCase().charAt(0)); } else {
-                varM += value.toLowerCase().charAt(i);
+            if (i == 0) { varM = new StringBuilder(Character.toString(value.toUpperCase().charAt(0))); } else {
+                varM.append(value.toLowerCase().charAt(i));
             }
         }
-        return varM;
+        return String.valueOf(varM);
     }
 
     @Override

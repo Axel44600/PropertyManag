@@ -16,16 +16,28 @@ public class AppartServiceImpl implements AppartService {
     private LoyerRepository loyerRepository;
     private GarantieRepository garantieRepository;
     private BilanRepository bilanRepository;
+    private AgenceRepository agenceRepository;
 
     @Autowired
     public void setInjectedBean(AppartRepository appartRepository, EtatRepository etatRepository, LoyerRepository loyerRepository,
-                                GarantieRepository garantieRepository, BilanRepository bilanRepository) {
+                                GarantieRepository garantieRepository, BilanRepository bilanRepository, AgenceRepository agenceRepository) {
         this.appartRepository = appartRepository;
         this.etatRepository = etatRepository;
         this.loyerRepository = loyerRepository;
         this.garantieRepository = garantieRepository;
         this.bilanRepository = bilanRepository;
+        this.agenceRepository = agenceRepository;
     }
+
+    // AGENCE
+    public final String getNameAgency(Integer idAgency) {
+        return agenceRepository.findById(idAgency).orElseThrow().getNomAgence();
+    }
+
+    public final Integer getExpensesAgency(Integer idAgency) {
+        return agenceRepository.findById(idAgency).orElseThrow().getFraisAgence();
+    }
+
 
     // APPARTEMENT
     @Override
@@ -129,7 +141,6 @@ public class AppartServiceImpl implements AppartService {
 
 
     // BILAN DES COMPTES DES LOYERS
-
     @Override
     public List<Bilan> getListOfBilans() {
         return bilanRepository.findAll();

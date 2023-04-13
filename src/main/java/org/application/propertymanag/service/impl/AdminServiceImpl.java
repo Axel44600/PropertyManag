@@ -1,18 +1,27 @@
 package org.application.propertymanag.service.impl;
 
 import org.application.propertymanag.auth.repository.UserRepository;
+import org.application.propertymanag.entity.Agence;
 import org.application.propertymanag.entity.Users;
+import org.application.propertymanag.repository.AgenceRepository;
 import org.application.propertymanag.service.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AdminServiceImpl implements AdminService {
 
-    @Autowired
     private UserRepository userRepository;
+    private AgenceRepository agenceRepository;
+
+    @Autowired
+    public void setInjectedBean(UserRepository userRepository, AgenceRepository agenceRepository) {
+        this.userRepository = userRepository;
+        this.agenceRepository = agenceRepository;
+    }
 
     @Override
     public Users getUserById(Integer id) {
@@ -42,6 +51,16 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public void deleteUser(Users u) {
         userRepository.delete(u);
+    }
+
+    @Override
+    public Optional<Agence> getAgencyById(Integer idAgency) {
+        return agenceRepository.findById(idAgency);
+    }
+
+    @Override
+    public void updateAgency(Agence agence) {
+        agenceRepository.save(agence);
     }
 
     public String getRandomStr(int n) {

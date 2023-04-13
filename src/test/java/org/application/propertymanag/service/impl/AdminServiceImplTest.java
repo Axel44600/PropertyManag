@@ -1,8 +1,10 @@
 package org.application.propertymanag.service.impl;
 
 import org.application.propertymanag.auth.repository.UserRepository;
+import org.application.propertymanag.entity.Agence;
 import org.application.propertymanag.entity.Role;
 import org.application.propertymanag.entity.Users;
+import org.application.propertymanag.repository.AgenceRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -29,10 +31,14 @@ class AdminServiceImplTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    AgenceRepository agenceRepository;
+
     @InjectMocks
     private AdminServiceImpl adminService;
 
     private Users user;
+    private Agence agence;
 
     @BeforeEach
     public void init() {
@@ -44,6 +50,12 @@ class AdminServiceImplTest {
                 .prenom("Alain")
                 .role(Role.EMPLOYE)
                 .registerKey(null)
+                .build();
+
+        agence = Agence.builder()
+                .idAgence(1)
+                .nomAgence("Infeco")
+                .fraisAgence(8)
                 .build();
     }
 
@@ -122,6 +134,17 @@ class AdminServiceImplTest {
         adminService.deleteUser(user);
 
         verify(userRepository, times(1)).delete(user);
+    }
+
+    @Test
+    void testGetAgencyId() {
+        Integer idAgency = agence.getIdAgence();
+        when(agenceRepository.findById(idAgency)).thenReturn(Optional.ofNullable(agence));
+        Optional<Agence> a = agenceRepository.findById(1);
+
+        a.ifPresent(agence ->  assertThat(agence.getIdAgence(), is(adminService.getAgencyById(idAgency).get().getIdAgence())));
+        a.ifPresent(agence ->  assertThat(agence.getNomAgence(), is(adminService.getAgencyById(idAgency).get().getNomAgence())));
+        a.ifPresent(agence ->  assertEquals(agence.getFraisAgence(), adminService.getAgencyById(idAgency).get().getFraisAgence()));
     }
 
     @Test

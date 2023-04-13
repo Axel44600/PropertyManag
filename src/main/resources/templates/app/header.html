@@ -10,6 +10,7 @@
     <ul class="navigation navigation-main" id="main-menu-navigation" data-menu="menu-navigation">
       <li class=" nav-item">
                <span style="text-align: center">
+                 <p>Agence : <span th:text="${agencyName}"></span></p>
                     <p>Poste :
                       <span th:if="${role.equals('ADMIN')}"><b>Gérant</b></span>
                        <span th:unless="${role.equals('ADMIN')}"><b>Employé</b></span>

@@ -37,6 +37,9 @@
                 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#thisModal">
                     Créer un compte utilisateur
                 </button>
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#agencyModal">
+                    Agence
+                </button>
             </p>
             <div class="collapse" id="collapseMod">
                 <div class="card card-body">
@@ -109,6 +112,36 @@
                                                 <option value="ADMIN">Gérant</option>
                                         </select>
                                     </div>
+                                    <div class="col">
+                                        <input type="submit" style="width: 100%;" value="VALIDER" class="btn btn-primary" />
+                                    </div>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal fade" id="agencyModal" tabindex="-1" aria-labelledby="agencyModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="agencyModalLabel">Agence immobilière</h1>
+                            <button type="button" id="close" class="btn-close" data-bs-dismiss="modal" aria-label="Annuler"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div id="alert" style="margin-bottom: 6px;"></div>
+                            <form id="updateAgency" method="post" action="./home">
+                                <div class="row">
+                                    <div class="col">
+                                        <input type="text" class="form-control" th:value="${nameAgency}" minlength="3" name="nameAgency" placeholder="Nom de l'agence" required>
+                                    </div>
+                                    <div class="col">
+                                        <input type="number" class="form-control" th:value="${expensesAgency}" name="expensesAgency" placeholder="Frais de l'agence en %" required>
+                                    </div>
+                                </div>
+
+                                <div class="row" style="margin-top: 8px;">
                                     <div class="col">
                                         <input type="submit" style="width: 100%;" value="VALIDER" class="btn btn-primary" />
                                     </div>

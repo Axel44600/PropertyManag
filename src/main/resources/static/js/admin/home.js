@@ -122,6 +122,39 @@ addEventListenerResearchUser();
 
 
 
+// UPDATE AGENCY
+function updateAgency(e) {
+    e.preventDefault();
+    const values = new FormData(document.getElementById("updateAgency"));
+    const result = document.getElementById("alert");
+
+    fetch("/app/admin/editAgency", {
+        method: "POST",
+        url : "/app/admin/editAgency",
+        body: values
+    }).then((response) => {
+        return response.json();
+    }).then((data) => {
+        if(data.success === "yes") {
+            result.innerText = "Les informations de l'agence ont été modifié avec succès.";
+            result.style.color = "green";
+            setTimeout(function() { result.innerText = ""; }, 5000);
+        } else if(data.error === "one") {
+            result.innerText = "Les frais d'agence ne peuvent pas être négatifs.";
+            result.style.color = "red";
+        } else if(data.error === "two") {
+            result.innerText = "Veuillez saisir tous les champs du formulaire.";
+            result.style.color = "red";
+        } else {
+            //
+        }
+    }).catch(error => {
+        console.log('Erreur : ' + error.message);
+    })
+}
+addEventListenerUpdateAgency();
+
+
 // EVENTS
 function addEventListenerCreateUser() {
     const form = document.getElementById("createUser");
@@ -130,4 +163,9 @@ function addEventListenerCreateUser() {
 function addEventListenerResearchUser() {
     const form = document.getElementById("researchUser");
     form.addEventListener("submit", researchUser, false);
+}
+
+function addEventListenerUpdateAgency() {
+    const form = document.getElementById("updateAgency");
+    form.addEventListener("submit", updateAgency, false);
 }

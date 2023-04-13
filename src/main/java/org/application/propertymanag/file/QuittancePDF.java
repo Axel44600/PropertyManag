@@ -9,21 +9,28 @@ import com.itextpdf.text.pdf.PdfWriter;
 import org.application.propertymanag.entity.Appartement;
 import org.application.propertymanag.entity.Locataire;
 import org.application.propertymanag.entity.Loyer;
+import org.application.propertymanag.service.impl.AppartServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-import static org.application.propertymanag.configuration.PathConfig.*;
-
+@Component
 public class QuittancePDF {
+
+    AppartServiceImpl appartService;
+
+    @Autowired
+    public void setInjectedBean(AppartServiceImpl appartService) {
+        this.appartService = appartService;
+    }
 
     private static final DateTimeFormatter formatters = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private static final LocalDate date = LocalDate.now();
@@ -31,14 +38,14 @@ public class QuittancePDF {
     private static final Font subFont = new Font(Font.FontFamily.HELVETICA, 16, Font.NORMAL);
     private static final Font smallBold = new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD);
     private static final Font small = new Font(Font.FontFamily.HELVETICA, 10, Font.NORMAL);
-    private final Storage storage = StorageOptions.newBuilder().setCredentials(ServiceAccountCredentials.fromStream(new FileInputStream(SERVICE_ACCOUNT_JSON_PATH))).build().getService();
 
-    public QuittancePDF() throws IOException {
-    }
 
-    public String createQuittance(Appartement appart, Locataire locataire, LocalDate dateDebut, LocalDate dateFin, String nameFile, List<Loyer> selectLoyers) {
+    public String createQuittance(AppartServiceImpl appartService, Appartement appart, Locataire locataire, LocalDate dateDebut, LocalDate dateFin, String nameFile, List<Loyer> selectLoyers) {
         String urlFile = null;
             try {
+                Storage storage = StorageOptions.newBuilder().setCredentials(ServiceAccountCredentials.fromStream(
+                        new FileInputStream(System.getProperty("user.dir")+"/target/classes/gcp-account-file.json"))).build().getService();
+
                 ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                 Document document = new Document();
                 PdfWriter.getInstance(document, byteArrayOutputStream);
@@ -49,17 +56,17 @@ public class QuittancePDF {
                     Float loyer = Float.valueOf(l.getMontant());
                     listOfLoyers.add(Double.valueOf(loyer));
                 }
-                addPage(document, appart, locataire, dateDebut, dateFin, listOfLoyers);
+                addPage(appartService, document, appart, locataire, dateDebut, dateFin, listOfLoyers);
                 document.close();
 
                 byte[] bytes = byteArrayOutputStream.toByteArray();
-                BlobId blobId = BlobId.of(NAME_BUCKET, nameFile);
+                BlobId blobId = BlobId.of("property-manag", nameFile);
                 BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
                 storage.create(blobInfo, bytes);
 
                 URL url = storage.signUrl(blobInfo, 1, TimeUnit.HOURS,
                         Storage.SignUrlOption.httpMethod(HttpMethod.GET),
-                        Storage.SignUrlOption.signWith(ServiceAccountCredentials.fromStream(new FileInputStream(SERVICE_ACCOUNT_JSON_PATH))));
+                        Storage.SignUrlOption.signWith(ServiceAccountCredentials.fromStream(new FileInputStream(System.getProperty("user.dir")+"/target/classes/gcp-account-file.json"))));
 
                 urlFile = String.valueOf(url);
             } catch (Exception e) {
@@ -72,7 +79,8 @@ public class QuittancePDF {
             document.addTitle("Quittance de loyer");
     }
 
-    private static void addPage(Document document, Appartement appart, Locataire locataire, LocalDate dateDebut, LocalDate dateFin, List<Double> listOfLoyers) throws DocumentException, IOException {
+    private static void addPage(AppartServiceImpl appartService, Document document, Appartement appart, Locataire locataire, LocalDate dateDebut, LocalDate dateFin, List<Double> listOfLoyers) throws DocumentException {
+
             Float loyer = Float.valueOf(appart.getMontantLoyer());
             Double totalLoyer = listOfLoyers.stream().mapToDouble(Double::doubleValue).sum();
             Float charges = Float.valueOf(appart.getMontantCharges());
@@ -106,7 +114,7 @@ public class QuittancePDF {
             tablePr.addCell(c1);
             tablePr.setHeaderRows(1);
 
-            PdfPCell c2 = new PdfPCell(new Phrase(APP_NAME));
+            PdfPCell c2 = new PdfPCell(new Phrase(appartService.getNameAgency(1)));
                 c2.setHorizontalAlignment(Element.ALIGN_LEFT);
                 c2.setPadding(6);
                 c2.setBorderWidthTop(0);
@@ -245,7 +253,7 @@ public class QuittancePDF {
 
             Paragraph txt = new Paragraph();
             addEmptyLine(txt, 2);
-            txt.add("Je soussigné(e) "+APP_NAME+" propriétaire du logement désigné ci-dessus, déclare avoir reçu de la part" +
+            txt.add("Je soussigné(e) "+appartService.getNameAgency(1)+", agence immobilière propriétaire du logement désigné ci-dessus, déclare avoir reçu de la part" +
                     " du locataire l'ensemble des sommes mentionnées au titre du loyer et des charges.");
             addEmptyLine(txt, 1);
             txt.setAlignment(Element.ALIGN_LEFT);
@@ -257,13 +265,15 @@ public class QuittancePDF {
 
             Paragraph txt1 = new Paragraph();
             txt1.setAlignment(Element.ALIGN_RIGHT);
+
             addEmptyLine(txt1, 2);
-            Image image = Image.getInstance(Objects.requireNonNull(QuittancePDF.class.getClassLoader().getResource("static/img/signature.png")));
-            image.scaleToFit(150, 60);
-            image.setAlignment(Element.ALIGN_RIGHT);
+
+            Paragraph signature = new Paragraph(appartService.getNameAgency(1));
+            signature.setFont(new Font(Font.FontFamily.COURIER));
+            signature.setAlignment(Element.ALIGN_RIGHT);
 
             document.add(txt1);
-            document.add(image);
+            document.add(signature);
 
             Paragraph space1 = new Paragraph();
             addEmptyLine(space1, 1);

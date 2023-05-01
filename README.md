@@ -9,7 +9,7 @@ Accès employé application -> Pseudonyme : <b>EmployeStudi2023</b> | Mot de pas
 </br>
 <a target="_blank" href="https://www.loom.com/share/1a456f0d51c5409c91a3ae9773891337">Présentation de l'application (2ème partie)</a>
 </br>
-<a target="_blank" href="https://trello.com/b/NkeJ8nnW">Trello</a>
+<a target="_blank" href="https://trello.com/b/NkeJ8nnW">Scrum Task Board (Trello)</a>
 </br>
 <a target="_blank" href="https://property-manage.herokuapp.com">Application</a>
 

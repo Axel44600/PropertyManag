@@ -1,5 +1,9 @@
 # PropertyManag
-Application web de gestion immobilière
+Application web de gestion immobilière </br>
+Java | Javascript | Spring | SpringBoot | Thymeleaf | OpenAPI Swagger | PostgreSQL | 
+<br>
+<br>
+Accès employé application -> Pseudonyme : <b>EmployeStudi2023</b> | Mot de passe : <b>R5-7P5ein@</b>
 
 <a target="_blank" href="https://www.loom.com/share/0c617114c3f04442a27df2371d096294">Présentation de l'application (1ère partie)</a>
 </br>

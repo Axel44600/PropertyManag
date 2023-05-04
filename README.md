@@ -1,6 +1,6 @@
 # PropertyManag
 Application web de gestion immobilière </br>
-Technologies et langages utilisés : Java | Javascript | Spring | SpringBoot | Thymeleaf | OpenAPI Swagger | PostgreSQL | Google Cloud Storage | iText
+Technologies et langages utilisés : Java | Javascript | Spring | SpringSecurity | SpringBoot | Thymeleaf | OpenAPI Swagger | PostgreSQL | Google Cloud Storage | iText
 <br>
 <br>
 Accès employé application -> Pseudonyme : <b>EmployeStudi2023</b> | Mot de passe : <b>R5-7P5ein@</b>

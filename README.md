@@ -1,5 +1,5 @@
 # PropertyManag
-Application web de gestion immobilière </br>
+Application web de gestion de location immobilière </br>
 Technologies et langages utilisés : Java | Javascript | Spring | SpringSecurity | SpringBoot | Thymeleaf | OpenAPI Swagger | PostgreSQL | Google Cloud Storage | iText
 <br>
 <br>
